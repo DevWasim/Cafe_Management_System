@@ -1,0 +1,62 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header flex justify-between items-center">
+                <h5>Ingredient Stock</h5>
+                <a href="{{ url_for('admin.add_inventory_item') }}" class="btn btn-primary">Add Ingredient</a>
+            </div>
+            <div class="card-body">
+                <div class="dt-responsive table-responsive">
+                    <table class="table table-striped table-bordered nowrap">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Quantity</th>
+                                <th>Low Stock Threshold</th>
+                                <th>Cost / Unit</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.quantity }} {{ item.unit }}</td>
+                                <td>{{ item.low_stock_threshold }} {{ item.unit }}</td>
+                                <td>${{ item.cost_per_unit }}</td>
+                                <td>
+                                    {% if item.quantity <= item.low_stock_threshold %} <span class="badge bg-danger">Low
+                                        Stock</span>
+                                        {% else %}
+                                        <span class="badge bg-success">In Stock</span>
+                                        {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin.edit_inventory_item', item_id=item.id) }}"
+                                        class="btn btn-sm btn-info">Edit</a>
+
+                                    <form action="{{ url_for('admin.delete_inventory_item', item_id=item.id) }}"
+                                        method="POST" class="inline" onsubmit="return confirm('Are you sure?');">
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">No ingredients found. <a
+                                        href="{{ url_for('admin.add_inventory_item') }}">Add your first ingredient</a>.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

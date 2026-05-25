@@ -1,0 +1,883 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="reservation-page">
+    <!-- Ambient Background -->
+    <div class="ambient-bg"></div>
+
+    <!-- Floating Particles -->
+    <div class="particle-container">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="reservation-hero">
+            <div class="hero-icon-wrapper">
+                <i class="fas fa-utensils hero-icon"></i>
+            </div>
+            <h1 class="hero-title">Reserve Your Table</h1>
+            <p class="hero-subtitle">Experience culinary excellence in an unforgettable setting</p>
+            <div class="hero-divider"></div>
+        </div>
+
+        <!-- Main Form Card -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} custom-alert animate-in">
+                    <i class="fas fa-info-circle me-2"></i>{{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <div class="reservation-card">
+                    <form action="{{ url_for('main.reserve_table') }}" method="POST" class="reservation-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <!-- Personal Information Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <h3 class="section-title">Personal Information</h3>
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-12">
+                                    <div class="input-group-modern">
+                                        <div class="input-icon">
+                                            <i class="fas fa-signature"></i>
+                                        </div>
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control modern-input" id="name" name="name"
+                                                placeholder="Full Name" required
+                                                value="{{ current_user.username if current_user.is_authenticated else '' }}">
+                                            <label for="name">Full Name</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="input-group-modern">
+                                        <div class="input-icon">
+                                            <i class="fas fa-envelope"></i>
+                                        </div>
+                                        <div class="form-floating">
+                                            <input type="email" class="form-control modern-input" id="email"
+                                                name="email" placeholder="Email Address" required
+                                                value="{{ current_user.email if current_user.is_authenticated else '' }}">
+                                            <label for="email">Email Address</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="input-group-modern">
+                                        <div class="input-icon">
+                                            <i class="fas fa-phone"></i>
+                                        </div>
+                                        <div class="form-floating">
+                                            <input type="tel" class="form-control modern-input" id="phone" name="phone"
+                                                placeholder="Phone Number" required
+                                                value="{{ current_user.phone if current_user.is_authenticated else '' }}">
+                                            <label for="phone">Phone Number</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reservation Details Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <h3 class="section-title">Reservation Details</h3>
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="input-group-modern">
+                                        <div class="input-icon">
+                                            <i class="fas fa-calendar-day"></i>
+                                        </div>
+                                        <div class="form-floating">
+                                            <input type="date" class="form-control modern-input" id="date" name="date"
+                                                placeholder="Date" required>
+                                            <label for="date">Select Date</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="input-group-modern">
+                                        <div class="input-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="form-floating">
+                                            <select class="form-select modern-input" id="time" name="time" required>
+                                                <option value="" selected disabled>Select Time</option>
+                                                {% for i in range(11, 23) %}
+                                                <option value="{{ '%02d'|format(i) }}:00">{{ '%02d'|format(i) }}:00
+                                                </option>
+                                                <option value="{{ '%02d'|format(i) }}:30">{{ '%02d'|format(i) }}:30
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                            <label for="time">Select Time</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="party-size-selector">
+                                        <label class="party-label">
+                                            <i class="fas fa-users me-2"></i>Number of Guests
+                                        </label>
+                                        <div class="party-options">
+                                            <input type="radio" name="party_size" value="1" id="party1"
+                                                class="party-radio">
+                                            <label for="party1" class="party-option">
+                                                <span class="party-number">1</span>
+                                                <span class="party-text">Guest</span>
+                                            </label>
+
+                                            <input type="radio" name="party_size" value="2" id="party2"
+                                                class="party-radio" checked>
+                                            <label for="party2" class="party-option">
+                                                <span class="party-number">2</span>
+                                                <span class="party-text">Guests</span>
+                                            </label>
+
+                                            <input type="radio" name="party_size" value="3" id="party3"
+                                                class="party-radio">
+                                            <label for="party3" class="party-option">
+                                                <span class="party-number">3</span>
+                                                <span class="party-text">Guests</span>
+                                            </label>
+
+                                            <input type="radio" name="party_size" value="4" id="party4"
+                                                class="party-radio">
+                                            <label for="party4" class="party-option">
+                                                <span class="party-number">4</span>
+                                                <span class="party-text">Guests</span>
+                                            </label>
+
+                                            <input type="radio" name="party_size" value="5" id="party5"
+                                                class="party-radio">
+                                            <label for="party5" class="party-option">
+                                                <span class="party-number">5</span>
+                                                <span class="party-text">Guests</span>
+                                            </label>
+
+                                            <input type="radio" name="party_size" value="6" id="party6"
+                                                class="party-radio">
+                                            <label for="party6" class="party-option">
+                                                <span class="party-number">6</span>
+                                                <span class="party-text">Guests</span>
+                                            </label>
+
+                                            <input type="radio" name="party_size" value="7" id="party7"
+                                                class="party-radio">
+                                            <label for="party7" class="party-option">
+                                                <span class="party-number">7</span>
+                                                <span class="party-text">Guests</span>
+                                            </label>
+
+                                            <input type="radio" name="party_size" value="8" id="party8"
+                                                class="party-radio">
+                                            <label for="party8" class="party-option">
+                                                <span class="party-number">8+</span>
+                                                <span class="party-text">Guests</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Special Requests Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-comment-dots"></i>
+                                </div>
+                                <h3 class="section-title">Special Requests</h3>
+                            </div>
+
+                            <div class="input-group-modern">
+                                <div class="input-icon" style="align-items: flex-start; padding-top: 1.5rem;">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </div>
+                                <div class="form-floating">
+                                    <textarea class="form-control modern-input" id="notes" name="notes"
+                                        placeholder="Special Requests" style="height: 120px; resize: none;"></textarea>
+                                    <label for="notes">Any special requests? (Optional)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn-confirm-reservation">
+                                <span class="btn-text">Confirm Reservation</span>
+                                <span class="btn-icon">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Info Cards -->
+                <div class="row g-4 mt-4 info-cards">
+                    <div class="col-md-4">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h4>Secure Booking</h4>
+                            <p>Your information is safe with us</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h4>Instant Confirmation</h4>
+                            <p>Get confirmed within minutes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-undo"></i>
+                            </div>
+                            <h4>Free Cancellation</h4>
+                            <p>Cancel anytime before 24 hours</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set minimum date to today
+        const dateInput = document.getElementById('date');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+
+        // Animation classes are applied via CSS, no need for Intersection Observer
+
+        // Add ripple effect to button
+        const btn = document.querySelector('.btn-confirm-reservation');
+        btn.addEventListener('click', function (e) {
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            this.appendChild(ripple);
+
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+</script>
+
+<style>
+    :root {
+        --neon-green: #00ff88;
+        --dark-bg: #0a0a0a;
+        --card-bg: rgba(20, 20, 20, 0.8);
+        --border-color: rgba(0, 255, 136, 0.2);
+        --text-muted: #888;
+    }
+
+    .reservation-page {
+        min-height: 100vh;
+        padding: 8rem 0 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Ambient Background */
+    .ambient-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+            radial-gradient(circle at 20% 30%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(0, 255, 136, 0.08) 0%, transparent 50%);
+        z-index: -1;
+        animation: ambientPulse 8s ease-in-out infinite;
+    }
+
+    @keyframes ambientPulse {
+
+        0%,
+        100% {
+            opacity: 0.5;
+        }
+
+        50% {
+            opacity: 0.8;
+        }
+    }
+
+    /* Floating Particles */
+    .particle-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .particle {
+        position: absolute;
+        background: var(--neon-green);
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: float 20s infinite ease-in-out;
+    }
+
+    .particle:nth-child(1) {
+        width: 4px;
+        height: 4px;
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .particle:nth-child(2) {
+        width: 6px;
+        height: 6px;
+        top: 60%;
+        left: 80%;
+        animation-delay: 2s;
+    }
+
+    .particle:nth-child(3) {
+        width: 3px;
+        height: 3px;
+        top: 40%;
+        left: 30%;
+        animation-delay: 4s;
+    }
+
+    .particle:nth-child(4) {
+        width: 5px;
+        height: 5px;
+        top: 80%;
+        left: 60%;
+        animation-delay: 6s;
+    }
+
+    .particle:nth-child(5) {
+        width: 4px;
+        height: 4px;
+        top: 30%;
+        left: 90%;
+        animation-delay: 8s;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0) translateX(0);
+        }
+
+        25% {
+            transform: translateY(-30px) translateX(20px);
+        }
+
+        50% {
+            transform: translateY(-60px) translateX(-20px);
+        }
+
+        75% {
+            transform: translateY(-30px) translateX(20px);
+        }
+    }
+
+    /* Hero Section */
+    .reservation-hero {
+        text-align: center;
+        margin-bottom: 4rem;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hero-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, var(--neon-green), #00cc6a);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        animation: iconPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes iconPulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 255, 136, 0.5);
+        }
+    }
+
+    .hero-icon {
+        font-size: 2rem;
+        color: #000;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        background: linear-gradient(135deg, #fff, var(--neon-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        color: #aaa;
+        margin-bottom: 1.5rem;
+        font-weight: 300;
+        letter-spacing: 1px;
+    }
+
+    .hero-divider {
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+        margin: 0 auto;
+        border-radius: 2px;
+    }
+
+    /* Reservation Card */
+    .reservation-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Form Sections */
+    .form-section {
+        margin-bottom: 3rem;
+        animation: fadeInUp 0.6s ease-out both;
+    }
+
+    .form-section:nth-child(1) {
+        animation-delay: 0.3s;
+    }
+
+    .form-section:nth-child(2) {
+        animation-delay: 0.4s;
+    }
+
+    .form-section:nth-child(3) {
+        animation-delay: 0.5s;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .section-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.1));
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .section-icon i {
+        color: var(--neon-green);
+        font-size: 1.25rem;
+    }
+
+    .section-header:hover .section-icon {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 255, 136, 0.15));
+        transform: rotate(5deg) scale(1.05);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    /* Modern Input Groups */
+    .input-group-modern {
+        position: relative;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1.25rem;
+        z-index: 10;
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
+
+    .modern-input {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 2px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        color: #fff !important;
+        padding-left: 3.5rem !important;
+        min-height: 60px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .modern-input:focus {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-color: var(--neon-green) !important;
+        box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.1) !important;
+        transform: translateY(-2px);
+    }
+
+    .modern-input:focus+label,
+    .modern-input:not(:placeholder-shown)+label {
+        color: var(--neon-green) !important;
+    }
+
+    .input-group-modern:has(.modern-input:focus) .input-icon {
+        color: var(--neon-green);
+        transform: scale(1.1);
+    }
+
+    .form-floating>label {
+        color: var(--text-muted);
+        padding-left: 3.5rem;
+    }
+
+    /* Party Size Selector */
+    .party-size-selector {
+        background: rgba(255, 255, 255, 0.03);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .party-size-selector:hover {
+        border-color: var(--border-color);
+    }
+
+    .party-label {
+        display: block;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .party-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .party-radio {
+        display: none;
+    }
+
+    .party-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .party-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.25rem;
+    }
+
+    .party-text {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .party-option:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--border-color);
+        transform: translateY(-2px);
+    }
+
+    .party-radio:checked+.party-option {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.1));
+        border-color: var(--neon-green);
+        box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+    }
+
+    .party-radio:checked+.party-option .party-number {
+        color: var(--neon-green);
+    }
+
+    .party-radio:checked+.party-option .party-text {
+        color: var(--neon-green);
+    }
+
+    /* Submit Button */
+    .form-actions {
+        margin-top: 2.5rem;
+    }
+
+    .btn-confirm-reservation {
+        width: 100%;
+        padding: 1.25rem 2rem;
+        background: linear-gradient(135deg, var(--neon-green), #00cc6a);
+        border: none;
+        border-radius: 12px;
+        color: #000;
+        font-size: 1.125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
+    }
+
+    .btn-confirm-reservation:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 255, 136, 0.6);
+    }
+
+    .btn-confirm-reservation:active {
+        transform: translateY(-1px);
+    }
+
+    .btn-icon {
+        font-size: 1.25rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-confirm-reservation:hover .btn-icon {
+        transform: translateX(5px);
+    }
+
+    .ripple {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        transform: scale(0);
+        animation: rippleEffect 0.6s ease-out;
+        pointer-events: none;
+    }
+
+    @keyframes rippleEffect {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    /* Info Cards */
+    .info-cards {
+        animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+
+    .info-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--neon-green);
+        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+    }
+
+    .info-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.1));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .info-icon i {
+        font-size: 1.5rem;
+        color: var(--neon-green);
+    }
+
+    .info-card:hover .info-icon {
+        transform: scale(1.1) rotate(10deg);
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 255, 136, 0.15));
+    }
+
+    .info-card h4 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-card p {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    /* Custom Alert */
+    .custom-alert {
+        background: rgba(0, 255, 136, 0.1);
+        border: 1px solid var(--neon-green);
+        border-radius: 12px;
+        color: #fff;
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .animate-in {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .reservation-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .party-options {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+        }
+    }
+
+    /* Date/Time picker styling for dark mode */
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    select::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+    }
+
+    .form-select option {
+        background: #1a1a1a;
+        color: #fff;
+    }
+</style>
+{% endblock %}

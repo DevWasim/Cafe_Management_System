@@ -1,0 +1,59 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="grid grid-cols-12 gap-x-6">
+    <div class="col-span-12">
+        <div class="card">
+            <div class="card-header flex justify-between items-center">
+                <h5>Menu Items</h5>
+                <a href="{{ url_for('admin.add_menu_item') }}" class="btn btn-primary btn-sm">+ Add Item</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Description</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>
+                                    <h6 class="mb-1">{{ item.name }}</h6>
+                                </td>
+                                <td>{{ item.category }}</td>
+                                <td>${{ item.price }}</td>
+                                <td class="text-muted text-sm">{{ item.description[:50] }}...</td>
+                                <td class="text-right">
+                                    <a href="{{ url_for('admin.manage_recipe', item_id=item.id) }}"
+                                        class="btn btn-sm btn-warning">Recipe</a>
+                                    <a href="{{ url_for('admin.edit_menu_item', item_id=item.id) }}"
+                                        class="btn btn-sm btn-info">Edit</a>
+
+                                    <form action="{{ url_for('admin.delete_menu_item', item_id=item.id) }}"
+                                        method="POST" class="inline" onsubmit="return confirm('Are you sure?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-link btn-sm p-0 text-danger-500">
+                                            <i class="feather icon-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">No menu items found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

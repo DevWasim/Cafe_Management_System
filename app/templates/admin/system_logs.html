@@ -1,0 +1,16 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="card h-full">
+    <div class="card-header flex justify-between items-center">
+        <h5>System Logs (Last 200 lines)</h5>
+        <a href="{{ url_for('admin.view_system_logs') }}" class="btn btn-sm btn-light-primary"><i
+                data-feather="refresh-cw" class="w-4 h-4 mr-1"></i> Refresh</a>
+    </div>
+    <div class="card-body p-0">
+        <pre
+            class="bg-gray-900 text-green-400 p-4 m-0 overflow-auto text-sm font-mono h-[600px]">{{ log_content }}</pre>
+    </div>
+</div>
+
+{% endblock %}

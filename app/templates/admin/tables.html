@@ -1,0 +1,96 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header flex justify-between items-center">
+        <h5>Table Management</h5>
+        <button class="btn btn-primary" type="button" onclick="toggleAddTableForm()">
+            <i class="feather icon-plus mr-2"></i> Add Table
+        </button>
+    </div>
+
+    <!-- Add Table Form -->
+    <div id="addTableForm" style="display: none;" class="p-4 bg-light-primary border-b border-primary-200">
+        <form action="{{ url_for('admin.add_table') }}" method="POST" class="flex flex-wrap gap-4 items-end">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.table_number.label(class="form-label") }}
+                {{ form.table_number(class="form-control", placeholder="e.g. 10") }}
+            </div>
+            <div>
+                {{ form.capacity.label(class="form-label") }}
+                {{ form.capacity(class="form-control", placeholder="e.g. 4") }}
+            </div>
+            <div>
+                {{ form.status.label(class="form-label") }}
+                {{ form.status(class="form-control") }}
+            </div>
+            <div>
+                {{ form.submit(class="btn btn-success") }}
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function toggleAddTableForm() {
+            var formDiv = document.getElementById('addTableForm');
+            if (formDiv.style.display === 'none') {
+                formDiv.style.display = 'block';
+            } else {
+                formDiv.style.display = 'none';
+            }
+        }
+    </script>
+
+    <div class="card-body">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for table in tables %}
+            <div class="card shadow-sm border-2 
+                {{ 'border-success-500 bg-success-50' if table.status == 'Available' }}
+                {{ 'border-danger-500 bg-danger-50' if table.status == 'Occupied' }}
+                {{ 'border-warning-500 bg-warning-50' if table.status == 'Reserved' }}
+                relative group transition-all hover:-translate-y-1">
+
+                <div class="card-body p-4 text-center">
+                    <h3 class="font-bold mb-1 text-2xl">Table {{ table.table_number }}</h3>
+                    <p class="text-muted mb-4 text-sm">{{ table.capacity }} Seats</p>
+
+                    <div class="badge mb-4
+                        {{ 'bg-success-500' if table.status == 'Available' }}
+                        {{ 'bg-danger-500' if table.status == 'Occupied' }}
+                        {{ 'bg-warning-500' if table.status == 'Reserved' }} text-white px-3 py-1">
+                        {{ table.status }}
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex justify-center gap-2">
+                        {% if table.status == 'Available' %}
+                        <a href="{{ url_for('admin.update_table_status', table_id=table.id, status='Occupied') }}"
+                            class="btn btn-sm btn-danger w-full" title="Mark Occupied">
+                            Occupy
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('admin.update_table_status', table_id=table.id, status='Available') }}"
+                            class="btn btn-sm btn-success w-full" title="Mark Available">
+                            Free
+                        </a>
+                        {% endif %}
+
+                        <form action="{{ url_for('admin.delete_table', table_id=table.id) }}" method="POST"
+                            onsubmit="return confirm('Delete Table {{ table.table_number }}?');">
+                            <button type="submit" class="btn btn-sm btn-light-danger"><i
+                                    class="feather icon-trash-2"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-span-full text-center py-12 text-muted">
+                <i class="feather icon-layout fa-3x mb-3 block"></i>
+                <p>No tables set up yet. Click "Add Table" to start.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

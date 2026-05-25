@@ -1,0 +1,196 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h3><i data-feather="monitor" class="me-2"></i>Kitchen Display System</h3>
+        <div>
+            <span class="badge bg-success me-2">Fresh (< 5m)</span>
+                    <span class="badge bg-warning text-dark me-2">Warning (> 10m)</span>
+                    <span class="badge bg-danger">Late (> 20m)</span>
+        </div>
+    </div>
+</div>
+
+<div class="row" id="kds-grid">
+    <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_GET_ORDERS = "{{ url_for('admin.kds_get_orders') }}";
+    const API_UPDATE_STATUS = "{{ url_for('admin.kds_update_status', order_id=0, new_status='STATUS') }}";
+
+    const REFRESH_INTERVAL = 5000; // 5 seconds polling
+
+    document.addEventListener('DOMContentLoaded', function () {
+        startKDS();
+    });
+
+    function startKDS() {
+        fetchOrders();
+        setInterval(fetchOrders, REFRESH_INTERVAL);
+        setInterval(updateTimers, 1000); // 1 sec local tick
+    }
+
+    function fetchOrders() {
+        fetch(API_GET_ORDERS)
+            .then(res => res.json())
+            .then(data => renderTickets(data))
+            .catch(err => console.error('KDS Fetch Error:', err));
+    }
+
+    function renderTickets(orders) {
+        const grid = document.getElementById('kds-grid');
+
+        if (orders.length === 0) {
+            grid.innerHTML = `
+                <div class="col-12 text-center py-5 text-muted">
+                    <i data-feather="check-circle" style="width: 64px; height: 64px; opacity: 0.5;"></i>
+                    <h2 class="mt-3">Kitchen Clear!</h2>
+                    <p class="lead">No active orders</p>
+                </div>
+            `;
+            if (typeof feather !== 'undefined') feather.replace();
+            return;
+        }
+
+        // We rebuild HTML but current DOM state (like input focus) isn't an issue here as it's read-only cards
+        // For smoother updates in a real app, we'd use React/Vue/Alpine. 
+        // Here we just replace innerHTML for simplicity.
+
+        let html = '';
+        orders.forEach(order => {
+            // Calculate initial time for static display before JS takes over
+            const orderDate = new Date(order.time_ordered_iso);
+            const now = new Date(); // Browser time (assuming synced roughly with server)
+            // Ideally use server time diff, but this is okay for display
+
+            // Status Logic
+            let statusBadge = '';
+            let actionBtn = '';
+            let cardBorder = '';
+
+            if (order.status === 'Pending') {
+                statusBadge = '<span class="badge bg-secondary">New</span>';
+                cardBorder = 'border-top border-4 border-secondary';
+                actionBtn = `
+                    <button class="btn btn-primary w-100" onclick="updateStatus(${order.id}, 'Preparing')">
+                        <i data-feather="play"></i> Start Preparing
+                    </button>`;
+            } else if (order.status === 'Preparing') {
+                statusBadge = '<span class="badge bg-info text-dark">Preparing...</span>';
+                cardBorder = 'border-top border-4 border-info';
+                actionBtn = `
+                    <button class="btn btn-success w-100" onclick="updateStatus(${order.id}, 'Ready')">
+                        <i data-feather="check"></i> Order Ready
+                    </button>`;
+            }
+
+            // Items List
+            let itemsHtml = '<ul class="list-group list-group-flush">';
+            order.items.forEach(item => {
+                const hasNotes = item.notes && item.notes.trim().length > 0;
+                itemsHtml += `
+                    <li class="list-group-item p-2 ${hasNotes ? 'bg-warning bg-opacity-10' : ''}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="fw-bold" style="font-size: 1.2rem;">${item.quantity}x ${item.name}</div>
+                        </div>
+                        ${item.options ? `<div class="text-muted small">${item.options}</div>` : ''}
+                        ${hasNotes ? `<div class="text-danger fw-bold mt-1"><i data-feather="alert-circle" style="width:12px"></i> NOTE: ${item.notes}</div>` : ''}
+                    </li>
+                `;
+            });
+            itemsHtml += '</ul>';
+
+            html += `
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
+                    <div class="card h-100 shadow-sm ${cardBorder}">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0">#${order.id}</h5>
+                                <small class="text-muted">${order.table === 'Takeaway' || order.table === 0 ? 'Takeaway' : 'Table ' + order.table}</small>
+                            </div>
+                            <div class="text-end">
+                                <h4 class="mb-0 order-timer" data-start="${order.time_ordered_iso}">00:00</h4>
+                                ${statusBadge}
+                            </div>
+                        </div>
+                        <div class="card-body p-0" style="overflow-y: auto; max-height: 400px;">
+                            ${itemsHtml}
+                        </div>
+                        <div class="card-footer bg-white p-2">
+                            ${actionBtn}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Prevent full re-render flickering if the HTML is largely the same? 
+        // For now, simpler to just replace.
+        grid.innerHTML = html;
+        if (typeof feather !== 'undefined') feather.replace();
+        updateTimers(); // Trigger run immediately
+    }
+
+    function updateStatus(id, newStatus) {
+        let url = API_UPDATE_STATUS.replace('/0/', `/${id}/`).replace('STATUS', newStatus);
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': document.querySelector('input[name="csrf_token"]')?.value || '' }
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    fetchOrders(); // Refresh UI
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+    }
+
+    function updateTimers() {
+        const timers = document.querySelectorAll('.order-timer');
+        const now = new Date();
+
+        timers.forEach(el => {
+            const startDate = new Date(el.getAttribute('data-start'));
+            // Start date is UTC, but new Date() might interpret as local if string doesn't specify Z. 
+            // Ideally server sends ISO with Z. Flask usually does.
+            // If server sends naive UTC, treating it as local might be wrong. 
+            // Let's assume server and client are same timezone for simple MVP or calculate diff carefully.
+
+            // Note: simple diff in ms
+            // If Flask sends UTC 10:00 and Browser is UTC+5 15:00, diff is 0 if we parse correctly.
+            // For this demo, let's assume we just want elapsed milliseconds.
+
+            // Adjust to use UTC to avoid timezone mess if possible
+            const diffMs = now - startDate;
+            // In a real production app, ensure both are UNIX timestamps to be safe.
+
+            // Convert to MM:SS
+            let seconds = Math.floor(diffMs / 1000);
+
+            // Color Logic based on minutes
+            const minutes = Math.floor(seconds / 60);
+            const parentHeader = el.closest('.card-header');
+
+            // Reset colors
+            el.classList.remove('text-success', 'text-warning', 'text-danger');
+
+            if (minutes < 5) el.classList.add('text-success');
+            else if (minutes < 20) el.classList.add('text-warning');
+            else el.classList.add('text-danger');
+
+            // Format 00:00
+            const s = seconds % 60;
+            el.innerText = `${minutes.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        });
+    }
+</script>
+{% endblock %}

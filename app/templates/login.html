@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-page">
+    <div class="auth-container">
+        <!-- Left: Visual Side -->
+        <div class="auth-visual">
+            <div class="visual-content">
+                <div class="auth-icon mb-6">
+                    <i class="fas fa-coffee" style="font-size: 4rem; color: var(--primary-color);"></i>
+                </div>
+                <h2 class="auth-visual-title">Welcome Back!</h2>
+                <p class="auth-visual-desc">Sign in to continue your journey with us</p>
+                <div class="features-list mt-8">
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle text-gold"></i>
+                        <span>Order your favorites</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle text-gold"></i>
+                        <span>Track order history</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle text-gold"></i>
+                        <span>Exclusive offers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Form Side -->
+        <div class="auth-form-side">
+            <div class="auth-form-wrapper">
+                <h1 class="auth-title">Login</h1>
+                <p class="auth-subtitle">Enter your credentials to access your account</p>
+
+                <form method="POST" action="" class="auth-form">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-field">
+                        <label for="email" class="field-label">
+                            <i class="fas fa-envelope mr-2"></i>Email Address
+                        </label>
+                        {% if form.email.errors %}
+                        {{ form.email(class="form-input error", placeholder="you@example.com") }}
+                        <div class="field-error">
+                            {% for error in form.email.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.email(class="form-input", placeholder="you@example.com") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="password" class="field-label">
+                            <i class="fas fa-lock mr-2"></i>Password
+                        </label>
+                        {% if form.password.errors %}
+                        {{ form.password(class="form-input error", placeholder="••••••••") }}
+                        <div class="field-error">
+                            {% for error in form.password.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.password(class="form-input", placeholder="••••••••") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-field-inline">
+                        <div class="remember-me">
+                            {{ form.remember(class="checkbox-input", id="remember") }}
+                            {{ form.remember.label(class="checkbox-label", for="remember") }}
+                        </div>
+                        <a href="#" class="forgot-link">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-auth">
+                        Sign In <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <span class="text-muted">Don't have an account?</span>
+                    <a href="{{ url_for('main.register') }}" class="auth-link">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

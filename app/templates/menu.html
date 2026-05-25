@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container fade-in" style="padding-bottom: 5rem;">
+    <div class="text-center mb-16 mt-12">
+        <h1 class="display-3 mb-2 font-bold uppercase tracking-wider text-white">Our Menu</h1>
+        <p class="text-gold text-lg font-medium tracking-wide mb-8">Experience the Taste of Excellence</p>
+        <div style="width: 60px; height: 4px; background: var(--primary-color); margin: 0 auto;"></div>
+    </div>
+
+    {% for category, items in grouped_items.items() %}
+    <div class="category-section fade-in mb-16">
+        <div class="flex items-center mb-8 border-b border-gray-800 pb-2">
+            <span class="bg-primary text-black font-bold uppercase py-2 px-8 text-xl"
+                style="background: var(--primary-color); clip-path: polygon(0 0, 95% 0, 100% 100%, 0% 100%);">
+                {{ category }}
+            </span>
+        </div>
+
+        <div class="menu-grid">
+            {% for item in items %}
+            <div class="menu-card">
+                <div class="card-img-container" style="height: 200px;">
+                    <img src="{{ url_for('static', filename='images/menu_items/' + item.image_file) }}"
+                        alt="{{ item.name }}" class="card-img"
+                        onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=80'">
+                </div>
+
+                <div class="card-content">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="card-title text-xl font-bold text-white m-0">{{ item.name }}</h3>
+                        <span class="price text-gold text-xl font-bold">${{ "%.2f"|format(item.price) }}</span>
+                    </div>
+                    <p class="card-desc text-muted text-sm mb-6 flex-grow-1">{{ item.description }}</p>
+
+                    <div class="card-footer mt-auto pt-4 border-t border-gray-800">
+                        {% if item.is_available %}
+                        <button class="btn btn-gold-outline w-full text-center justify-center text-sm"
+                            data-id="{{ item.id }}" data-name="{{ item.name }}" data-price="{{ item.price }}"
+                            data-options='{{ item.options|tojson|safe if item.options else "{}" }}'
+                            onclick="openCustomizeModal(this)">
+                            Add to Order
+                        </button>
+                        {% else %}
+                        <button class="btn btn-secondary w-full cursor-not-allowed opacity-50" disabled>Sold
+                            Out</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-20">
+        <h3 class="text-muted text-2xl">No menu items here yet.</h3>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Customization Modal -->
+<div class="modal fade" id="customizeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content"
+            style="background: var(--bg-surface); border: 1px solid var(--glass-border); color: var(--text-main);">
+            <div class="modal-header border-b border-gray-700">
+                <h5 class="modal-title font-bold text-xl" id="modalItemName">Customize Item</h5>
+                <button type="button" class="btn-close filter-invert" data-bs-dismiss="modal" aria-label="Close"
+                    style="filter: invert(1);"></button>
+            </div>
+            <form id="addToCartForm" method="POST" action="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body p-6">
+                    <input type="hidden" name="dummy" value="1">
+                    <div id="modalOptionsContainer"></div>
+                    <div class="mt-6 text-end font-bold text-xl text-gold">
+                        Price: $<span id="modalBasePrice">0.00</span>
+                    </div>
+                </div>
+                <div class="modal-footer border-t border-gray-700 p-4">
+                    <button type="button" class="btn text-white hover:text-white"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary font-bold text-black">Add to Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openCustomizeModal(btn) {
+        const itemId = btn.dataset.id;
+        const name = btn.dataset.name;
+        const price = parseFloat(btn.dataset.price);
+        const options = JSON.parse(btn.dataset.options);
+
+        document.getElementById('modalItemName').textContent = name;
+        document.getElementById('modalBasePrice').textContent = price.toFixed(2);
+
+        const form = document.getElementById('addToCartForm');
+        form.action = `/add_to_cart_custom/${itemId}`;
+
+        const container = document.getElementById('modalOptionsContainer');
+        container.innerHTML = '';
+
+        // Helper to create sections
+        const createSection = (label, type, name, choices) => {
+            if (!choices || choices.length === 0) return;
+
+            const group = document.createElement('div');
+            group.className = 'mb-4';
+            group.innerHTML = `<label class="block font-bold text-gray-400 mb-2 uppercase text-xs tracking-wide">${label}</label>`;
+
+            if (type === 'select') {
+                const select = document.createElement('select');
+                select.name = name;
+                select.className = 'form-control w-full';
+                choices.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    select.appendChild(opt);
+                });
+                group.appendChild(select);
+            } else if (type === 'checkbox') {
+                choices.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'form-check mb-2';
+                    const safeId = name + '_' + c.replace(/\s+/g, '');
+                    div.innerHTML = `
+                        <input class="form-check-input" type="checkbox" name="${name}" value="${c}" id="${safeId}">
+                        <label class="form-check-label text-gray-300 ml-2" for="${safeId}">${c}</label>
+                    `;
+                    group.appendChild(div);
+                });
+            }
+            container.appendChild(group);
+        };
+
+        createSection('Size', 'select', 'size', options.sizes);
+        createSection('Sugar Level', 'select', 'sugar', options.sugar_levels);
+        createSection('Add-ons', 'checkbox', 'addons', options.add_ons);
+
+        if (container.innerHTML === '') {
+            container.innerHTML = '<p class="text-muted">No customization required for this item.</p>';
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('customizeModal'));
+        modal.show();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Assign Shift</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.user_id.label(class="form-label") }}
+                        {% if form.user_id.errors %}
+                        {{ form.user_id(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.user_id.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.user_id(class="form-select") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.date.label(class="form-label") }}
+                        {% if form.date.errors %}
+                        {{ form.date(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.date.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.date(class="form-control", type="date") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.start_time.label(class="form-label") }}
+                            {% if form.start_time.errors %}
+                            {{ form.start_time(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.start_time.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.start_time(class="form-control", type="time") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.end_time.label(class="form-label") }}
+                            {% if form.end_time.errors %}
+                            {{ form.end_time(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.end_time.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.end_time(class="form-control", type="time") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.notes.label(class="form-label") }}
+                        {% if form.notes.errors %}
+                        {{ form.notes(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.notes.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.notes(class="form-control") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        {{ form.submit(class="btn btn-primary") }}
+                        <a href="{{ url_for('admin.manage_shifts') }}" class="btn btn-light-secondary mt-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

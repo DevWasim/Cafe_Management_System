@@ -1,0 +1,98 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<!-- Staff Management Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="card bg-blue-500 text-white">
+        <div class="card-body">
+            <h5 class="text-white">Total Staff</h5>
+            <h2 class="text-white text-3xl font-bold">{{ staff_members|length }}</h2>
+            <p class="text-white/80 text-sm">Active employees</p>
+        </div>
+    </div>
+
+    <div class="card bg-green-500 text-white">
+        <div class="card-body">
+            <h5 class="text-white">Active Shifts Today</h5>
+            <h2 class="text-white text-3xl font-bold">--</h2>
+            <p class="text-white/80 text-sm">Scheduled for today</p>
+        </div>
+    </div>
+
+    <div class="card bg-purple-500 text-white">
+        <div class="card-body">
+            <h5 class="text-white">Manager Roles</h5>
+            <h2 class="text-white text-3xl font-bold">
+                {% set managers = namespace(value=0) %}
+                {% for s in staff_members %}
+                {% if s.role == 'Manager' %}
+                {% set managers.value = managers.value + 1 %}
+                {% endif %}
+                {% endfor %}
+                {{ managers.value }}
+            </h2>
+            <p class="text-white/80 text-sm">Admins/Managers</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header flex justify-between items-center">
+        <h5>Staff Members</h5>
+        <a href="{{ url_for('admin.add_staff') }}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i data-feather="plus"></i> Add Staff
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Phone</th>
+                        <th>Hourly Rate</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in staff_members %}
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-light-secondary flex items-center justify-center text-primary font-bold text-lg">
+                                    {{ user.username[0]|upper }}
+                                </div>
+                                <span class="font-medium">{{ user.username }}</span>
+                            </div>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="badge bg-light-primary text-primary">{{ user.role }}</span>
+                        </td>
+                        <td>{{ user.phone }}</td>
+                        <td>${{ "%.2f"|format(user.hourly_rate) }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.edit_staff', user_id=user.id) }}"
+                                class="btn btn-sm btn-light-secondary me-2">
+                                <i data-feather="edit-2"></i>
+                            </a>
+                            <form action="{{ url_for('admin.delete_staff', user_id=user.id) }}" method="POST"
+                                class="d-inline"
+                                onsubmit="return confirm('Are you sure you want to delete this staff member?');">
+                                <button type="submit" class="btn btn-sm btn-light-danger">
+                                    <i data-feather="trash-2"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

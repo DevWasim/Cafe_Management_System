@@ -1,0 +1,108 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Menu Item Info -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Menu Item: {{ menu_item.name }}</h5>
+            </div>
+            <div class="card-body">
+                <img src="{{ url_for('static', filename='images/menu_items/' + menu_item.image_file) }}"
+                    class="img-fluid rounded mb-3" alt="{{ menu_item.name }}">
+                <p><strong>Category:</strong> {{ menu_item.category }}</p>
+                <p><strong>Price:</strong> ${{ menu_item.price }}</p>
+                <a href="{{ url_for('admin.manage_menu') }}" class="btn btn-secondary btn-block mt-3">Back to Menu</a>
+            </div>
+        </div>
+
+        <!-- Add Ingredient Form -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Add/Update Ingredient</h5>
+            </div>
+            <div class="card-body">
+                <form action="" method="POST">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Ingredient</label>
+                        <select name="inventory_item_id" class="form-control" required>
+                            {% for item in all_ingredients %}
+                            <option value="{{ item.id }}">{{ item.name }} ({{ item.unit }})</option>
+                            {% else %}
+                            <option disabled>No ingredients found. Add ingredients first.</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Quantity Required (per portion)</label>
+                        <input type="number" step="0.001" name="quantity_required" class="form-control"
+                            placeholder="e.g. 0.05 for 50g" required>
+                        <small class="text-muted">Enter amount in the ingredient's unit.</small>
+                    </div>
+                    {% if all_ingredients %}
+                    <button type="submit" class="btn btn-success btn-block">Add to Recipe</button>
+                    {% else %}
+                    <a href="{{ url_for('admin.add_inventory_item') }}" class="btn btn-warning btn-block">Create
+                        Ingredients First</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipe List -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Current Recipe</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Ingredient</th>
+                                <th>Quantity Required</th>
+                                <th>Unit</th>
+                                <th>Estimated Cost</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set total_cost = 0 %}
+                            {% for ring in current_recipe %}
+                            {% set cost = ring.quantity_required * ring.inventory_item.cost_per_unit %}
+                            {% set total_cost = total_cost + cost %}
+                            <tr>
+                                <td>{{ ring.inventory_item.name }}</td>
+                                <td>{{ ring.quantity_required }}</td>
+                                <td>{{ ring.inventory_item.unit }}</td>
+                                <td>${{ "%.2f"|format(cost) }}</td>
+                                <td>
+                                    <form action="{{ url_for('admin.remove_ingredient_from_recipe', id=ring.id) }}"
+                                        method="POST" class="inline" onsubmit="return confirm('Remove ingredient?');">
+                                        <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">No ingredients defined for this item.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-right">Total Estimated Cost:</th>
+                                <th>${{ "%.2f"|format(total_cost) }}</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

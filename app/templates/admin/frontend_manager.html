@@ -1,0 +1,256 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Frontend Manager</h5>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs mb-3" id="frontendTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="hero-tab" data-bs-toggle="tab" href="#hero" role="tab"
+                    aria-controls="hero" aria-selected="true">Hero Section</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="story-tab" data-bs-toggle="tab" href="#story" role="tab" aria-controls="story"
+                    aria-selected="false">Story & Values</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="team-tab" data-bs-toggle="tab" href="#team" role="tab" aria-controls="team"
+                    aria-selected="false">Team</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="gallery-tab" data-bs-toggle="tab" href="#gallery" role="tab"
+                    aria-controls="gallery" aria-selected="false">Gallery</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="about-tab" data-bs-toggle="tab" href="#about" role="tab" aria-controls="about"
+                    aria-selected="false">About Us (Legacy)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="style-tab" data-bs-toggle="tab" href="#style" role="tab" aria-controls="style"
+                    aria-selected="false">Styles & Colors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="social-tab" data-bs-toggle="tab" href="#social" role="tab"
+                    aria-controls="social" aria-selected="false">Social Media</a>
+            </li>
+        </ul>
+
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="tab-content" id="frontendTabContent">
+
+                <!-- Hero Tab -->
+                <div class="tab-pane fade show active" id="hero" role="tabpanel" aria-labelledby="hero-tab">
+                    <div class="mb-3">
+                        {{ form.hero_title.label(class="form-label") }}
+                        {{ form.hero_title(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.hero_subtitle.label(class="form-label") }}
+                        {{ form.hero_subtitle(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.short_description.label(class="form-label") }}
+                        {{ form.short_description(class="form-control", rows=3) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.hero_image.label(class="form-label") }}
+                        {{ form.hero_image(class="form-control") }}
+                        {% if setting.hero_image %}
+                        <div class="mt-2">
+                            <img src="{{ url_for('static', filename='images/hero/' + setting.hero_image) }}"
+                                alt="Current Hero" class="img-thumbnail" style="max-height: 150px;">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Story & Values Tab -->
+                <div class="tab-pane fade" id="story" role="tabpanel" aria-labelledby="story-tab">
+                    <div class="mb-3">
+                        {{ form.story_title.label(class="form-label") }}
+                        {{ form.story_title(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.story_content.label(class="form-label") }}
+                        {{ form.story_content(class="form-control", rows=5) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.mission_content.label(class="form-label") }}
+                        {{ form.mission_content(class="form-control", rows=3) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.vision_content.label(class="form-label") }}
+                        {{ form.vision_content(class="form-control", rows=3) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.story_image.label(class="form-label") }}
+                        {{ form.story_image(class="form-control") }}
+                        {% if setting.story_image %}
+                        <div class="mt-2">
+                            <img src="{{ url_for('static', filename='images/about/' + setting.story_image) }}"
+                                alt="Current Story" class="img-thumbnail" style="max-height: 150px;">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Team Tab -->
+                <div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Team Members</h5>
+                        <a href="{{ url_for('admin.add_team_member') }}" class="btn btn-sm btn-success">Add Member</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Visible</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if team_members %}
+                                {% for member in team_members %}
+                                <tr>
+                                    <td><img src="{{ url_for('static', filename='images/team/' + member.image_file) }}"
+                                            height="40"></td>
+                                    <td>{{ member.name }}</td>
+                                    <td>{{ member.role }}</td>
+                                    <td>{{ 'Yes' if member.is_visible else 'No' }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin.edit_team_member', id=member.id) }}"
+                                            class="btn btn-sm btn-primary">Edit</a>
+                                        <form action="{{ url_for('admin.delete_team_member', id=member.id) }}"
+                                            method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Delete this member?')">Del</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No team members yet.</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Gallery Tab -->
+                <div class="tab-pane fade" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Gallery Photos</h5>
+                        <a href="{{ url_for('admin.add_gallery_photo') }}" class="btn btn-sm btn-success">Add Photo</a>
+                    </div>
+                    <div class="row">
+                        {% if gallery_photos %}
+                        {% for photo in gallery_photos %}
+                        <div class="col-md-3 mb-3">
+                            <div class="card h-100">
+                                <img src="{{ url_for('static', filename='images/gallery/' + photo.image_file) }}"
+                                    class="card-img-top" style="height: 150px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <p class="card-text small mb-1">{{ photo.caption or 'No caption' }}</p>
+                                    <form action="{{ url_for('admin.delete_gallery_photo', id=photo.id) }}"
+                                        method="POST">
+                                        <button type="submit" class="btn btn-xs btn-danger w-100"
+                                            onclick="return confirm('Delete this photo?')">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-12 text-center">No photos yet.</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- About Tab -->
+                <div class="tab-pane fade" id="about" role="tabpanel" aria-labelledby="about-tab">
+                    <div class="mb-3">
+                        {{ form.about_title.label(class="form-label") }}
+                        {{ form.about_title(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.about_content.label(class="form-label") }}
+                        {{ form.about_content(class="form-control", rows=5) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.about_image.label(class="form-label") }}
+                        {{ form.about_image(class="form-control") }}
+                        {% if setting.about_image %}
+                        <div class="mt-2">
+                            <img src="{{ url_for('static', filename='images/about/' + setting.about_image) }}"
+                                alt="Current About" class="img-thumbnail" style="max-height: 150px;">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Styles Tab -->
+                <div class="tab-pane fade" id="style" role="tabpanel" aria-labelledby="style-tab">
+                    <div class="mb-3">
+                        {{ form.theme_color_primary.label(class="form-label") }}
+                        {{ form.theme_color_primary(class="form-control", type="color", style="width: 100px; height:
+                        50px;") }}
+                        <small class="text-muted">Main Brand Color (Buttons, Highlights)</small>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.theme_color_secondary.label(class="form-label") }}
+                        {{ form.theme_color_secondary(class="form-control", type="color", style="width: 100px; height:
+                        50px;") }}
+                        <small class="text-muted">Secondary/Background Details Color</small>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.menu_bg_color.label(class="form-label") }}
+                        {{ form.menu_bg_color(class="form-control", type="color", style="width: 100px; height: 50px;")
+                        }}
+                        <small class="text-muted">Page Background Color for Menu</small>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.card_bg_color.label(class="form-label") }}
+                        {{ form.card_bg_color(class="form-control", type="color", style="width: 100px; height: 50px;")
+                        }}
+                        <small class="text-muted">Background Color for Menu Cards</small>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.text_color.label(class="form-label") }}
+                        {{ form.text_color(class="form-control", type="color", style="width: 100px; height: 50px;") }}
+                        <small class="text-muted">Primary Text Color</small>
+                    </div>
+                </div>
+
+                <!-- Social Tab -->
+                <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
+                    <div class="mb-3">
+                        {{ form.social_facebook.label(class="form-label") }}
+                        {{ form.social_facebook(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.social_instagram.label(class="form-label") }}
+                        {{ form.social_instagram(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.social_twitter.label(class="form-label") }}
+                        {{ form.social_twitter(class="form-control") }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

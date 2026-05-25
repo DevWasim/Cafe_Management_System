@@ -1,0 +1,51 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h5>User Management</h5>
+    </div>
+    <div class="card-body table-border-style">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.is_admin %}
+                            <span class="badge bg-success">Admin</span>
+                            {% else %}
+                            <span class="badge bg-secondary">User</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.id != current_user.id %}
+                            <a href="{{ url_for('admin.toggle_admin', user_id=user.id) }}"
+                                class="btn btn-sm {{ 'btn-outline-danger' if user.is_admin else 'btn-outline-success' }}">
+                                {{ 'Revoke Admin' if user.is_admin else 'Make Admin' }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted text-sm">Current User</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

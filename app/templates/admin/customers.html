@@ -1,0 +1,67 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<!-- Customer Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="card bg-blue-500 text-white">
+        <div class="card-body">
+            <h5 class="text-white">Total Customers</h5>
+            <h2 class="text-white text-3xl font-bold">{{ customers|length }}</h2>
+            <p class="text-white/80 text-sm">Registered users</p>
+        </div>
+    </div>
+    <!-- Future stats: Active Today, New This Month -->
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Customer List</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Loyalty Points</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-light-primary flex items-center justify-center text-primary font-bold text-lg">
+                                    {{ customer.username[0]|upper }}
+                                </div>
+                                <span class="font-medium">{{ customer.username }}</span>
+                            </div>
+                        </td>
+                        <td>{{ customer.email }}</td>
+                        <td>{{ customer.phone or '-' }}</td>
+                        <td>
+                            <span class="badge bg-light-warning text-warning">{{ customer.loyalty_points }} pts</span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin.customer_details', user_id=customer.id) }}"
+                                class="btn btn-sm btn-light-primary">
+                                <i data-feather="eye"></i> View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">No customers found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

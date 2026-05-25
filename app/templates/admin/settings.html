@@ -1,0 +1,110 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Cafe Settings</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <h6 class="mb-3 text-primary">General Information</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.cafe_name.label(class="form-label") }}
+                            {{ form.cafe_name(class="form-control" + (" is-invalid" if form.cafe_name.errors else ""))
+                            }}
+                            {% for error in form.cafe_name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.cafe_logo.label(class="form-label") }}
+                            {{ form.cafe_logo(class="form-control" + (" is-invalid" if form.cafe_logo.errors else ""))
+                            }}
+                            {% if form.cafe_logo.errors %}
+                            {% for error in form.cafe_logo.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                            {% endif %}
+                            {% if setting.cafe_logo %}
+                            <small class="text-muted">Current: {{ setting.cafe_logo }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.cafe_phone.label(class="form-label") }}
+                            {{ form.cafe_phone(class="form-control") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.cafe_email.label(class="form-label") }}
+                            {{ form.cafe_email(class="form-control") }}
+                        </div>
+                        <div class="col-12 mb-3">
+                            {{ form.cafe_address.label(class="form-label") }}
+                            {{ form.cafe_address(class="form-control", rows=2) }}
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-3 text-primary">Operations & Financials</h6>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            {{ form.opening_time.label(class="form-label") }}
+                            {{ form.opening_time(class="form-control") }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ form.closing_time.label(class="form-label") }}
+                            {{ form.closing_time(class="form-control") }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            {{ form.currency_symbol.label(class="form-label") }}
+                            {{ form.currency_symbol(class="form-control") }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            {{ form.tax_rate.label(class="form-label") }}
+                            {{ form.tax_rate(class="form-control") }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            {{ form.service_charge.label(class="form-label") }}
+                            {{ form.service_charge(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-3 text-primary">Hardware & Locale</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.printer_ip.label(class="form-label") }}
+                            {{ form.printer_ip(class="form-control") }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            {{ form.printer_port.label(class="form-label") }}
+                            {{ form.printer_port(class="form-control") }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ form.language.label(class="form-label") }}
+                            {{ form.language(class="form-select") }}
+                        </div>
+                        <div class="col-md-3 mb-3 d-flex align-items-end">
+                            <div class="form-check form-switch mb-2">
+                                {{ form.pos_enabled(class="form-check-input") }}
+                                {{ form.pos_enabled.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

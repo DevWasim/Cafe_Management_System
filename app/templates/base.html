@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if title %}
+    <title>{{ cafe_settings.cafe_name if cafe_settings else 'Lumina Cafe' }} - {{ title }}</title>
+    {% else %}
+    <title>{{ cafe_settings.cafe_name if cafe_settings else 'Lumina Cafe' }}</title>
+    {% endif %}
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Background Canvas -->
+    <canvas id="webgl-bg"></canvas>
+
+    <!-- Overlay for readability -->
+    <div class="bg-overlay"></div>
+
+    <header class="glass-header">
+        <nav class="navbar container">
+            <a href="{{ url_for('main.home') }}" class="nav-brand flex items-center gap-2">
+                {% if cafe_settings and cafe_settings.cafe_logo and cafe_settings.cafe_logo != 'default_logo.png' %}
+                <img src="{{ url_for('static', filename='images/profile/' + cafe_settings.cafe_logo) }}" alt="Logo"
+                    style="height: 40px;">
+                {% endif %}
+                <span class="brand-text">{{ cafe_settings.cafe_name if cafe_settings else 'Lumina' }}</span><span
+                    class="brand-dot">.</span>
+            </a>
+
+            <button class="mobile-toggle" aria-label="Toggle Menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+
+            <ul class="nav-links">
+                <li><a href="{{ url_for('main.home') }}"
+                        class="{{ 'active' if request.endpoint == 'main.home' }}">Home</a></li>
+                <li><a href="{{ url_for('main.menu') }}"
+                        class="{{ 'active' if request.endpoint == 'main.menu' }}">Menu</a></li>
+                <!-- Reservation link - Disabled for now, can be re-enabled in future -->
+                <li><a href="{{ url_for('main.reserve_table') }}"
+                        class="{{ 'active' if request.endpoint == 'main.reserve_table' }}">Reservations</a></li>
+                <!-- Cart Badge Logic -->
+                {% set cart_count = session.get('cart', {})|length %}
+                <li>
+                    <a href="{{ url_for('main.view_cart') }}"
+                        class="cart-link {{ 'active' if request.endpoint == 'main.view_cart' }}">
+                        Cart
+                        {% if cart_count > 0 %}
+                        <span class="cart-badge">{{ cart_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+
+                <li class="auth-divider">|</li>
+
+                {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                <li><a href="{{ url_for('admin.dashboard') }}" class="admin-link">Dashboard</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('main.login') }}">Login</a></li>
+                <li><a href="{{ url_for('main.register') }}" class="btn btn-gold-outline text-sm">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container mt-20">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                    <button class="close-alert">&times;</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="glass-footer">
+        <div class="container">
+            <p>&copy; {{ 2025 }} {{ cafe_settings.cafe_name if cafe_settings else 'Lumina Cafe' }}. Crafted with <i
+                    class="fas fa-heart text-gold"></i></p>
+            {% if cafe_settings and cafe_settings.cafe_address %}
+            <p class="text-sm text-gray-400 mt-1">{{ cafe_settings.cafe_address }} | {{ cafe_settings.cafe_phone }}</p>
+            {% endif %}
+            <div class="social-links">
+                <a
+                    href="{{ cafe_settings.social_instagram if cafe_settings and cafe_settings.social_instagram else '#' }}"><i
+                        class="fab fa-instagram"></i></a>
+                <a href="{{ cafe_settings.social_twitter if cafe_settings and cafe_settings.social_twitter else '#' }}"><i
+                        class="fab fa-twitter"></i></a>
+                <a
+                    href="{{ cafe_settings.social_facebook if cafe_settings and cafe_settings.social_facebook else '#' }}"><i
+                        class="fab fa-facebook"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/scene.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

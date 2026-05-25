@@ -1,0 +1,54 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">{{ title }}</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    {{ form.name.label(class="form-label") }}
+                    {% if form.name.errors %}
+                    {{ form.name(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.name.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.name(class="form-control") }}
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.role.label(class="form-label") }}
+                    {{ form.role(class="form-control") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.bio.label(class="form-label") }}
+                    {{ form.bio(class="form-control", rows=3) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.image_file.label(class="form-label") }}
+                    {{ form.image_file(class="form-control") }}
+                </div>
+
+                <div class="mb-3 form-check">
+                    {{ form.is_visible(class="form-check-input") }}
+                    {{ form.is_visible.label(class="form-check-label") }}
+                </div>
+
+                <div class="mt-4">
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('admin.manage_frontend') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

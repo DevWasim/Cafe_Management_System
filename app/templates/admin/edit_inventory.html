@@ -1,0 +1,93 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5>{{ legend }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {% if form.name.errors %}
+                        {{ form.name(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.name.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.name(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-3">
+                            {{ form.quantity.label(class="form-label") }}
+                            {% if form.quantity.errors %}
+                            {{ form.quantity(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.quantity.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.quantity(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            {{ form.unit.label(class="form-label") }}
+                            {% if form.unit.errors %}
+                            {{ form.unit(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.unit.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.unit(class="form-control") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-3">
+                            {{ form.low_stock_threshold.label(class="form-label") }}
+                            {% if form.low_stock_threshold.errors %}
+                            {{ form.low_stock_threshold(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.low_stock_threshold.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.low_stock_threshold(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            {{ form.cost_per_unit.label(class="form-label") }}
+                            {% if form.cost_per_unit.errors %}
+                            {{ form.cost_per_unit(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.cost_per_unit.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.cost_per_unit(class="form-control") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary") }}
+                        <a href="{{ url_for('admin.manage_inventory') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

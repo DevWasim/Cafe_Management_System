@@ -1,0 +1,55 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Customer Feedback</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Rating</th>
+                        <th>Comment</th>
+                        <th>Related Order</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in feedback_entries %}
+                    <tr>
+                        <td>{{ entry.date_posted.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ entry.user.username }}</td>
+                        <td>
+                            <div class="flex text-warning">
+                                {% for i in range(entry.rating) %}
+                                <i data-feather="star" class="fill-current w-4 h-4"></i>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <p class="mb-0 text-truncate" style="max-width: 300px;">{{ entry.comment or '-' }}</p>
+                        </td>
+                        <td>
+                            {% if entry.order_id %}
+                            <a href="{{ url_for('admin.order_details', order_id=entry.order_id) }}">#{{ entry.order_id
+                                }}</a>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">No feedback received yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

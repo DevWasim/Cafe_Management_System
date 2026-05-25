@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-page">
+    <div class="auth-container">
+        <!-- Left: Visual Side -->
+        <div class="auth-visual">
+            <div class="visual-content">
+                <div class="auth-icon mb-6">
+                    <i class="fas fa-user-plus" style="font-size: 4rem; color: var(--primary-color);"></i>
+                </div>
+                <h2 class="auth-visual-title">Join Us Today!</h2>
+                <p class="auth-visual-desc">Create an account and start enjoying premium benefits</p>
+                <div class="features-list mt-8">
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle text-gold"></i>
+                        <span>Fast checkout</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle text-gold"></i>
+                        <span>Save favorites</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle text-gold"></i>
+                        <span>Member rewards</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Form Side -->
+        <div class="auth-form-side">
+            <div class="auth-form-wrapper">
+                <h1 class="auth-title">Sign Up</h1>
+                <p class="auth-subtitle">Create your account in seconds</p>
+
+                <form method="POST" action="" class="auth-form">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-field">
+                        <label for="username" class="field-label">
+                            <i class="fas fa-user mr-2"></i>Username
+                        </label>
+                        {% if form.username.errors %}
+                        {{ form.username(class="form-input error", placeholder="johndoe") }}
+                        <div class="field-error">
+                            {% for error in form.username.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.username(class="form-input", placeholder="johndoe") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="email" class="field-label">
+                            <i class="fas fa-envelope mr-2"></i>Email Address
+                        </label>
+                        {% if form.email.errors %}
+                        {{ form.email(class="form-input error", placeholder="you@example.com") }}
+                        <div class="field-error">
+                            {% for error in form.email.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.email(class="form-input", placeholder="you@example.com") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="password" class="field-label">
+                            <i class="fas fa-lock mr-2"></i>Password
+                        </label>
+                        {% if form.password.errors %}
+                        {{ form.password(class="form-input error", placeholder="••••••••") }}
+                        <div class="field-error">
+                            {% for error in form.password.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.password(class="form-input", placeholder="••••••••") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="confirm_password" class="field-label">
+                            <i class="fas fa-lock mr-2"></i>Confirm Password
+                        </label>
+                        {% if form.confirm_password.errors %}
+                        {{ form.confirm_password(class="form-input error", placeholder="••••••••") }}
+                        <div class="field-error">
+                            {% for error in form.confirm_password.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.confirm_password(class="form-input", placeholder="••••••••") }}
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn-auth">
+                        Create Account <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <span class="text-muted">Already have an account?</span>
+                    <a href="{{ url_for('main.login') }}" class="auth-link">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

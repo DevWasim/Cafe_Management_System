@@ -1,0 +1,297 @@
+/* Glassmorphic Admin Theme */
+
+:root {
+    --glass-bg: rgba(30, 30, 30, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 15px;
+    --neon-green: #64dd17;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --bg-dark-radial: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+}
+
+body {
+    background: var(--bg-dark-radial) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+    min-height: 100vh;
+}
+
+/* Sidebar & Header Glass */
+.pc-sidebar,
+.pc-header {
+    background: rgba(20, 20, 20, 0.8) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    border-right: 1px solid var(--glass-border) !important;
+    box-shadow: none !important;
+}
+
+.pc-header {
+    border-bottom: 1px solid var(--glass-border) !important;
+    border-right: none !important;
+}
+
+/* Base Card Style */
+.card {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+    color: var(--text-primary) !important;
+    border-radius: 16px !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 32px 0 rgba(100, 221, 23, 0.1) !important;
+    border-color: rgba(100, 221, 23, 0.3) !important;
+}
+
+/* Card Headers & text */
+.card-header,
+.card-footer {
+    background: transparent !important;
+    border-color: var(--glass-border) !important;
+}
+
+.card-header h5,
+.card-title,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+}
+
+/* Tables */
+.table {
+    color: var(--text-primary) !important;
+    border-color: var(--glass-border) !important;
+}
+
+.table thead th {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: var(--neon-green) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid var(--glass-border) !important;
+    transition: background 0.2s;
+}
+
+.table tbody tr:hover {
+    background: rgba(100, 221, 23, 0.05) !important;
+}
+
+.table td {
+    border-color: var(--glass-border) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* Sidebar Links */
+.pc-navbar .pc-item .pc-link {
+    color: var(--text-secondary) !important;
+}
+
+.pc-navbar .pc-item.active .pc-link,
+.pc-navbar .pc-item:hover .pc-link {
+    background: rgba(100, 221, 23, 0.1) !important;
+    color: var(--neon-green) !important;
+}
+
+.pc-navbar .pc-item.active .pc-micon i,
+.pc-navbar .pc-item:hover .pc-micon i {
+    color: var(--neon-green) !important;
+}
+
+.pc-navbar .pc-caption label {
+    color: var(--neon-green) !important;
+    opacity: 0.7;
+}
+
+/* Icons */
+i[data-feather],
+.feather {
+    color: var(--text-secondary);
+}
+
+.text-success-500,
+.text-primary-500,
+.text-warning-500 {
+    /* Make stats icons neon */
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+/* Form Inputs */
+.form-control,
+.form-select {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-primary) !important;
+    backdrop-filter: blur(5px);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--neon-green) !important;
+    box-shadow: 0 0 0 2px rgba(100, 221, 23, 0.2) !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Dropdowns */
+.dropdown-menu {
+    background: #1a1a1a !important;
+    border: 1px solid var(--glass-border) !important;
+    backdrop-filter: blur(20px) !important;
+}
+
+.dropdown-item {
+    color: var(--text-secondary) !important;
+}
+
+.dropdown-item:hover {
+    background: rgba(100, 221, 23, 0.1) !important;
+    color: var(--neon-green) !important;
+}
+
+/* ============================================
+   LIGHT THEME OVERRIDES
+   ============================================ */
+[data-pc-theme="light"] {
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --neon-green: #388e3c;
+    --text-primary: #1a1a1a;
+    --text-secondary: #666666;
+    --bg-light-radial: radial-gradient(circle at center, #f5f5f5 0%, #e0e0e0 100%);
+}
+
+[data-pc-theme="light"] body {
+    background: var(--bg-light-radial) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-pc-theme="light"] .pc-sidebar,
+[data-pc-theme="light"] .pc-header {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-pc-theme="light"] .card {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-pc-theme="light"] .card:hover {
+    box-shadow: 0 8px 24px 0 rgba(56, 142, 60, 0.15) !important;
+    border-color: rgba(56, 142, 60, 0.3) !important;
+}
+
+[data-pc-theme="light"] .card-header h5,
+[data-pc-theme="light"] .card-title,
+[data-pc-theme="light"] h1,
+[data-pc-theme="light"] h2,
+[data-pc-theme="light"] h3,
+[data-pc-theme="light"] h4,
+[data-pc-theme="light"] h5,
+[data-pc-theme="light"] h6 {
+    color: var(--text-primary) !important;
+}
+
+[data-pc-theme="light"] .table {
+    color: var(--text-primary) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-pc-theme="light"] .table thead th {
+    background: rgba(56, 142, 60, 0.1) !important;
+    color: var(--neon-green) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-pc-theme="light"] .table tbody tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-pc-theme="light"] .table tbody tr:hover {
+    background: rgba(56, 142, 60, 0.05) !important;
+}
+
+[data-pc-theme="light"] .table td {
+    border-color: rgba(0, 0, 0, 0.08) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-pc-theme="light"] .pc-navbar .pc-item .pc-link {
+    color: var(--text-secondary) !important;
+}
+
+[data-pc-theme="light"] .pc-navbar .pc-item.active .pc-link,
+[data-pc-theme="light"] .pc-navbar .pc-item:hover .pc-link {
+    background: rgba(56, 142, 60, 0.1) !important;
+    color: var(--neon-green) !important;
+}
+
+[data-pc-theme="light"] .pc-navbar .pc-item.active .pc-micon i,
+[data-pc-theme="light"] .pc-navbar .pc-item:hover .pc-micon i {
+    color: var(--neon-green) !important;
+}
+
+[data-pc-theme="light"] .pc-navbar .pc-caption label {
+    color: var(--neon-green) !important;
+}
+
+[data-pc-theme="light"] i[data-feather],
+[data-pc-theme="light"] .feather {
+    color: var(--text-secondary);
+}
+
+[data-pc-theme="light"] .form-control,
+[data-pc-theme="light"] .form-select {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-pc-theme="light"] .form-control:focus,
+[data-pc-theme="light"] .form-select:focus {
+    border-color: var(--neon-green) !important;
+    box-shadow: 0 0 0 2px rgba(56, 142, 60, 0.2) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-pc-theme="light"] .dropdown-menu {
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-pc-theme="light"] .dropdown-item {
+    color: var(--text-secondary) !important;
+}
+
+[data-pc-theme="light"] .dropdown-item:hover {
+    background: rgba(56, 142, 60, 0.1) !important;
+    color: var(--neon-green) !important;
+}
+
+[data-pc-theme="light"] .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-pc-theme="light"] .breadcrumb-item a {
+    color: var(--neon-green) !important;
+}
+
+[data-pc-theme="light"] .alert {
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}

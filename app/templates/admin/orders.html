@@ -1,0 +1,132 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header pb-0 border-b-0">
+        <h5 class="mb-0">Manage Orders</h5>
+    </div>
+    <div class="card-body">
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-2 mb-4 justify-between items-center">
+            <div class="flex gap-2 flex-wrap">
+                <a href="{{ url_for('admin.manage_orders') }}"
+                    class="btn btn-sm {{ 'btn-dark' if not status_filter and not type_filter else 'btn-outline-secondary' }}">All</a>
+
+                <div class="btn-group">
+                    <span class="btn btn-sm btn-light disabled">Status:</span>
+                    <a href="{{ url_for('admin.manage_orders', status='Pending', type=type_filter) }}"
+                        class="btn btn-sm {{ 'btn-warning' if status_filter == 'Pending' else 'btn-outline-warning' }}">Pending</a>
+                    <a href="{{ url_for('admin.manage_orders', status='Preparing', type=type_filter) }}"
+                        class="btn btn-sm {{ 'btn-info' if status_filter == 'Preparing' else 'btn-outline-info' }}">Preparing</a>
+                    <a href="{{ url_for('admin.manage_orders', status='Ready', type=type_filter) }}"
+                        class="btn btn-sm {{ 'btn-primary' if status_filter == 'Ready' else 'btn-outline-primary' }}">Ready</a>
+                    <a href="{{ url_for('admin.manage_orders', status='Completed', type=type_filter) }}"
+                        class="btn btn-sm {{ 'btn-success' if status_filter == 'Completed' else 'btn-outline-success' }}">Completed</a>
+                    <a href="{{ url_for('admin.manage_orders', status='Cancelled', type=type_filter) }}"
+                        class="btn btn-sm {{ 'btn-danger' if status_filter == 'Cancelled' else 'btn-outline-danger' }}">Cancelled</a>
+                </div>
+
+                <div class="btn-group">
+                    <span class="btn btn-sm btn-light disabled">Type:</span>
+                    <a href="{{ url_for('admin.manage_orders', type='Dine-in', status=status_filter) }}"
+                        class="btn btn-sm {{ 'btn-secondary' if type_filter == 'Dine-in' else 'btn-outline-secondary' }}">Dine-in</a>
+                    <a href="{{ url_for('admin.manage_orders', type='Takeaway', status=status_filter) }}"
+                        class="btn btn-sm {{ 'btn-secondary' if type_filter == 'Takeaway' else 'btn-outline-secondary' }}">Takeaway</a>
+                    <a href="{{ url_for('admin.manage_orders', type='Delivery', status=status_filter) }}"
+                        class="btn btn-sm {{ 'btn-secondary' if type_filter == 'Delivery' else 'btn-outline-secondary' }}">Delivery</a>
+                </div>
+            </div>
+
+            <div class="text-muted text-sm">{{ orders|length }} Orders Found</div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#ID</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Table</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr
+                        class="{{ 'bg-light-danger' if order.status == 'Cancelled' else ('bg-light-success' if order.status == 'Completed' else '') }}">
+                        <td><strong>#{{ order.id }}</strong></td>
+                        <td>
+                            {{ order.date_ordered.strftime('%d %b %Y') }}<br>
+                            <small class="text-muted">{{ order.date_ordered.strftime('%H:%M') }}</small>
+                        </td>
+                        <td>
+                            {% if order.order_type == 'Dine-in' %}
+                            <i class="feather icon-users text-primary"></i> Dine-in
+                            {% elif order.order_type == 'Takeaway' %}
+                            <i class="feather icon-shopping-bag text-warning"></i> Takeaway
+                            {% elif order.order_type == 'Delivery' %}
+                            <i class="feather icon-truck text-info"></i> Delivery
+                            {% else %}
+                            {{ order.order_type }}
+                            {% endif %}
+                        </td>
+                        <td>{{ order.table_number if order.table_number else '-' }}</td>
+                        <td>${{ "%.2f"|format(order.total_price) }}</td>
+                        <td>
+                            <span class="badge 
+                                {{ 'bg-warning-500' if order.status == 'Pending' }}
+                                {{ 'bg-info-500' if order.status == 'Preparing' }}
+                                {{ 'bg-primary-500' if order.status == 'Ready' }}
+                                {{ 'bg-success-500' if order.status == 'Completed' }}
+                                {{ 'bg-danger-500' if order.status == 'Cancelled' }}
+                                text-white">{{ order.status }}</span>
+                        </td>
+                        <td>
+                            <div class="flex gap-2">
+                                <a href="{{ url_for('admin.order_details', order_id=order.id) }}"
+                                    class="btn btn-sm btn-light-primary" title="View Details">
+                                    <i class="feather icon-eye"></i> View
+                                </a>
+
+                                <div class="dropdown inline-block">
+                                    <button class="btn btn-sm btn-light-secondary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false" data-bs-boundary="viewport">
+                                        <i class="feather icon-more-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu shadow-lg">
+                                        <li><a class="dropdown-item"
+                                                href="{{ url_for('admin.update_order_status', order_id=order.id, status='Preparing') }}"><i
+                                                    class="feather icon-loader text-info me-2"></i>Mark Preparing</a>
+                                        </li>
+                                        <li><a class="dropdown-item"
+                                                href="{{ url_for('admin.update_order_status', order_id=order.id, status='Ready') }}"><i
+                                                    class="feather icon-bell text-primary me-2"></i>Mark Ready</a></li>
+                                        <li><a class="dropdown-item"
+                                                href="{{ url_for('admin.update_order_status', order_id=order.id, status='Completed') }}"><i
+                                                    class="feather icon-check text-success me-2"></i>Mark Completed</a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item text-danger"
+                                                href="{{ url_for('admin.update_order_status', order_id=order.id, status='Cancelled') }}"><i
+                                                    class="feather icon-x-circle me-2"></i>Cancel Order</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">No orders found matching the criteria.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

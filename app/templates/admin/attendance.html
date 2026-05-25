@@ -1,0 +1,74 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header flex justify-between items-center">
+        <h5>Attendance Records</h5>
+        <a href="{{ url_for('admin.add_attendance') }}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i data-feather="plus"></i> Log Attendance
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Staff Member</th>
+                        <th>Status</th>
+                        <th>Clock In</th>
+                        <th>Clock Out</th>
+                        <th>Hours</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span class="font-medium">{{ record.staff.username }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if record.status == 'Present' %}
+                            <span class="badge bg-light-success text-success">Present</span>
+                            {% elif record.status == 'Late' %}
+                            <span class="badge bg-light-warning text-warning">Late</span>
+                            {% elif record.status == 'Absent' %}
+                            <span class="badge bg-light-danger text-danger">Absent</span>
+                            {% else %}
+                            <span class="badge bg-light-secondary">{{ record.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.clock_in.strftime('%H:%M') if record.clock_in else '-' }}</td>
+                        <td>{{ record.clock_out.strftime('%H:%M') if record.clock_out else '-' }}</td>
+                        <td>
+                            <!-- Calculate duration if clock_out exists -->
+                            {% if record.clock_in and record.clock_out %}
+                            <!-- Naive diff, just showing raw or -- -->
+                            {{ ((record.clock_out - record.clock_in).seconds / 3600)|round(1) }} hrs
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!-- Edit/Delete could replace this -->
+                            <button class="btn btn-sm btn-light-secondary" title="Edit (Not Impl)">
+                                <i data-feather="edit-2"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">No attendance records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

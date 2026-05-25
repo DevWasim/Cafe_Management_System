@@ -1,0 +1,257 @@
+/* --- Clean App-Style Cart --- */
+
+.cart-wrapper {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr;
+    gap: 60px;
+    align-items: start;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.cart-list {
+    width: 100%;
+}
+
+.billing-panel {
+    background: var(--bg-surface);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    position: sticky;
+    top: 120px;
+}
+
+/* App Item Row */
+.app-item-row {
+    display: flex;
+    align-items: center;
+    padding: 25px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 20px;
+}
+
+.app-item-row:last-child {
+    border-bottom: none;
+}
+
+/* Round Images */
+.item-visual {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--glass-border);
+}
+
+.item-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-info {
+    flex-grow: 1;
+}
+
+.item-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: white;
+}
+
+.item-desc {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Desktop Actions */
+.item-actions-desktop {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.item-price-lg {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--primary-color);
+}
+
+.action-icon {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    opacity: 0.7;
+    transition: all 0.2s;
+}
+
+.action-icon:hover {
+    opacity: 1;
+    color: #ff4444;
+    transform: scale(1.1);
+}
+
+/* Mobile Specifics */
+.item-meta-mobile {
+    display: none;
+}
+
+.qty-pill {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Billing Section */
+.billing-header {
+    font-size: 1.3rem;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+.bill-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.bill-row span:last-child {
+    color: white;
+    font-weight: 500;
+}
+
+.bill-divider {
+    height: 1px;
+    background: var(--glass-border);
+    margin: 25px 0;
+}
+
+.bill-total {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+}
+
+.total-amount {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+}
+
+.btn-checkout {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--primary-color);
+    color: #000;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-checkout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(100, 221, 23, 0.4);
+    background: var(--primary-hover);
+}
+
+/* Add More Section */
+.add-more-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.add-more-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.add-more-btn:hover {
+    color: var(--primary-color);
+}
+
+.icon-box {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    transition: all 0.2s;
+}
+
+.add-more-btn:hover .icon-box {
+    background: var(--primary-color);
+    color: #000;
+}
+
+/* Empty Cart State */
+.empty-cart {
+    padding: 100px 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .cart-wrapper {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .billing-panel {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .app-item-row {
+        align-items: flex-start;
+        padding: 20px 0;
+    }
+
+    .item-visual {
+        width: 65px;
+        height: 65px;
+    }
+
+    .item-actions-desktop {
+        display: none;
+    }
+
+    .item-meta-mobile {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .item-price {
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 1.05rem;
+    }
+}

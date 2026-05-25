@@ -1,0 +1,73 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header flex justify-between items-center">
+        <h5>Shift Schedule</h5>
+        <a href="{{ url_for('admin.assign_shift') }}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i data-feather="plus"></i> Assign New Shift
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Staff Member</th>
+                        <th>Time</th>
+                        <th>Duration</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for shift in shifts %}
+                    <tr>
+                        <td class="whitespace-nowrap">
+                            <i data-feather="calendar" class="w-4 h-4 inline-block me-1 text-muted"></i>
+                            {{ shift.date.strftime('%Y-%m-%d') }}
+                            <br>
+                            <span class="text-xs text-muted ms-5">{{ shift.date.strftime('%A') }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span class="font-medium">{{ shift.staff.username }}</span>
+                                <span class="badge bg-light-secondary ms-2">{{ shift.staff.role }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            {{ shift.start_time.strftime('%H:%M') }} - {{ shift.end_time.strftime('%H:%M') }}
+                        </td>
+                        <td>
+                            <!-- Calculate duration if possible in Jinja, or backend. 
+                            Since we have time objects, simple subtraction might fail in pure jinja without custom filter if they are time objects.
+                            Let's skip duration calculation complexity for now and just show times. -->
+                            --
+                        </td>
+                        <td>
+                            <span class="text-truncate d-inline-block" style="max-width: 200px;">
+                                {{ shift.notes or '-' }}
+                            </span>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('admin.delete_shift', shift_id=shift.id) }}" method="POST"
+                                class="d-inline" onsubmit="return confirm('Remove this shift?');">
+                                <button type="submit" class="btn btn-sm btn-light-danger">
+                                    <i data-feather="trash-2"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">No upcoming shifts scheduled.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

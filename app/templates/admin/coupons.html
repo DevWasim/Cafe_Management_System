@@ -1,0 +1,72 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header flex justify-between items-center">
+        <h5>Manage Coupons</h5>
+        <a href="{{ url_for('admin.add_coupon') }}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i data-feather="plus"></i> Create Coupon
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Discount</th>
+                        <th>Valid Until</th>
+                        <th>Usage</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for coupon in coupons %}
+                    <tr>
+                        <td><span class="font-mono font-bold">{{ coupon.code }}</span></td>
+                        <td>
+                            {% if coupon.discount_type == 'Percentage' %}
+                            {{ coupon.discount_value }}%
+                            {% else %}
+                            ${{ coupon.discount_value }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ coupon.valid_to.strftime('%Y-%m-%d') }}
+                            {% if coupon.valid_to < now %} <span class="text-danger text-xs">(Expired)</span>
+                                {% endif %}
+                        </td>
+                        <td>{{ coupon.used_count }} / {{ coupon.usage_limit }}</td>
+                        <td>
+                            {% if coupon.active %}
+                            <span class="badge bg-light-success text-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-light-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin.edit_coupon', coupon_id=coupon.id) }}"
+                                class="btn btn-sm btn-light-secondary me-2">
+                                <i data-feather="edit-2"></i>
+                            </a>
+                            <form action="{{ url_for('admin.delete_coupon', coupon_id=coupon.id) }}" method="POST"
+                                class="d-inline" onsubmit="return confirm('Delete this coupon?');">
+                                <button type="submit" class="btn btn-sm btn-light-danger">
+                                    <i data-feather="trash-2"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">No coupons found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

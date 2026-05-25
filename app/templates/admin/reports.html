@@ -1,0 +1,137 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12 d-flex justify-content-between align-items-center">
+        <h2>Reports & Analytics</h2>
+        <a href="{{ url_for('admin.export_reports_csv') }}" class="btn btn-success">
+            <i class="feather icon-download"></i> Export Data (CSV)
+        </a>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="card bg-c-blue order-card text-white">
+            <div class="card-body">
+                <h6 class="m-b-20">Total Revenue</h6>
+                <h2 class="text-right"><i class="feather icon-credit-card f-left"></i><span>${{
+                        "%.2f"|format(total_revenue) }}</span></h2>
+                <p class="m-b-0">Lifetime Sales</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-c-green order-card text-white">
+            <div class="card-body">
+                <h6 class="m-b-20">Total Profit</h6>
+                <h2 class="text-right"><i class="feather icon-tag f-left"></i><span>${{ "%.2f"|format(total_profit)
+                        }}</span></h2>
+                <p class="m-b-0">Revenue - Cost</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-c-yellow order-card text-white">
+            <div class="card-body">
+                <h6 class="m-b-20">Recent Activity</h6>
+                <h2 class="text-right"><i class="feather icon-activity f-left"></i><span>Last 30 Days</span></h2>
+                <p class="m-b-0">See charts below</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Daily Sales Chart -->
+    <div class="col-xl-8 col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Daily Sales (Last 30 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="dailySalesChart" style="height:300px"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Items -->
+    <div class="col-xl-4 col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Top Selling Items</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for name, qty in top_items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ name }}
+                        <span class="badge bg-primary rounded-pill">{{ qty }} Sold</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item">No sales data yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Peak Hours -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Peak Operating Hours</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="peakHoursChart" style="height:300px"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Daily Sales Data
+    const salesCtx = document.getElementById('dailySalesChart').getContext('2d');
+    const salesDates = {{ daily_sales| map(attribute = 'date') | list | tojson }};
+    const salesRevenue = {{ daily_sales| map(attribute = 'revenue') | list | tojson }};
+
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: salesDates,
+            datasets: [{
+                label: 'Revenue ($)',
+                data: salesRevenue,
+                borderColor: '#4099ff',
+                backgroundColor: 'rgba(64, 153, 255, 0.2)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Peak Hours Data
+    const peakCtx = document.getElementById('peakHoursChart').getContext('2d');
+    const peakLabels = {{ peak_hours| map(attribute = 'hour') | list | tojson }}.map(h => h + ":00");
+    const peakCounts = {{ peak_hours| map(attribute = 'count') | list | tojson }};
+
+    new Chart(peakCtx, {
+        type: 'bar',
+        data: {
+            labels: peakLabels,
+            datasets: [{
+                label: 'Orders Placed',
+                data: peakCounts,
+                backgroundColor: '#2ed8b6'
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+</script>
+{% endblock %}

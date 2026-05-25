@@ -1,0 +1,102 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="card-grid" style="grid-template-columns: 1fr; max-width: 800px; margin: 0 auto;">
+    <div class="card">
+        <h3 style="margin-bottom: 2rem; font-size: 1.5rem;">{{ legend }}</h3>
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div style="margin-bottom: 1.5rem;">
+                {{ form.name.label(style="display: block; margin-bottom: 0.5rem; font-weight: 500;") }}
+                {{ form.name(style="width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 8px;") }}
+                {% if form.name.errors %}
+                <div style="color: red; font-size: 0.8rem; margin-top: 0.5rem;">{{ form.name.errors[0] }}</div>
+                {% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <!-- Price -->
+                <div>
+                    {{ form.price.label(style="display: block; margin-bottom: 0.5rem; font-weight: 500;") }}
+                    {{ form.price(style="width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 8px;") }}
+                    {% if form.price.errors %}
+                    <div style="color: red; font-size: 0.8rem; margin-top: 0.5rem;">{{ form.price.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <!-- Cost -->
+                <div>
+                    {{ form.cost.label(style="display: block; margin-bottom: 0.5rem; font-weight: 500;") }}
+                    {{ form.cost(style="width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 8px;") }}
+                    {% if form.cost.errors %}
+                    <div style="color: red; font-size: 0.8rem; margin-top: 0.5rem;">{{ form.cost.errors[0] }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <!-- Category -->
+                <div>
+                    {{ form.category.label(style="display: block; margin-bottom: 0.5rem; font-weight: 500;") }}
+                    {{ form.category(style="width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 8px;
+                    background: #fff;") }}
+                </div>
+            </div>
+
+            <!-- Image Upload -->
+            <div style="margin-bottom: 1.5rem;">
+                {{ form.image_file.label(style="display: block; margin-bottom: 0.5rem; font-weight: 500;") }}
+                {{ form.image_file(style="width: 100%; padding: 0.5rem; background: #f9f9f9; border-radius: 8px;") }}
+                {% if form.image_file.errors %}
+                {% for error in form.image_file.errors %}
+                <span style="color: red; font-size: 0.8rem;">{{ error }}</span>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Custom Options -->
+            <div
+                style="margin-bottom: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <h4 style="margin-bottom: 1rem; font-size: 1.1rem; color: #475569;">Customization Options <span
+                        style="font-size: 0.8rem; font-weight: normal; color: #94a3b8;">(Separate by comma)</span></h4>
+
+                <div style="margin-bottom: 1rem;">
+                    {{ form.sizes.label(style="display: block; margin-bottom: 0.5rem; font-weight: 500;") }}
+                    {{ form.sizes(style="width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 8px;",
+                    placeholder="e.g. Small, Medium, Large") }}
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    {{ form.sugar_levels.label(style="display: block; margin-bottom: 0.5rem; font-weight: 500;") }}
+                    {{ form.sugar_levels(style="width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius:
+                    8px;", placeholder="e.g. 0%, 50%, 100%") }}
+                </div>
+
+                <div>
+                    {{ form.add_ons.label(style="display: block; margin-bottom: 0.5rem; font-weight: 500;") }}
+                    {{ form.add_ons(style="width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 8px;",
+                    placeholder="e.g. Extra Shot, Whipped Cream") }}
+                </div>
+            </div>
+
+            <!-- Available Toggle -->
+            <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                {{ form.is_available() }}
+                {{ form.is_available.label(style="cursor: pointer; font-weight: 500;") }}
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                {{ form.description.label(style="display: block; margin-bottom: 0.5rem; font-weight: 500;") }}
+                {{ form.description(style="width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 8px;
+                min-height: 100px;") }}
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                {{ form.submit(class="btn-primary") }}
+                <a href="{{ url_for('admin.manage_menu') }}"
+                    style="padding: 0.8rem 1.5rem; color: var(--muted-text); font-weight: 500;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

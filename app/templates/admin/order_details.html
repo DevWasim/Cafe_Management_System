@@ -1,0 +1,149 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="grid grid-cols-12 gap-6">
+    <!-- Order Info -->
+    <div class="col-span-12 lg:col-span-8">
+        <div class="card">
+            <div class="card-header border-b flex justify-between items-center">
+                <h5>Order Details: #{{ order.id }}</h5>
+                <span class="badge 
+                    {{ 'bg-warning-500' if order.status == 'Pending' }}
+                    {{ 'bg-info-500' if order.status == 'Preparing' }}
+                    {{ 'bg-primary-500' if order.status == 'Ready' }}
+                    {{ 'bg-success-500' if order.status == 'Completed' }}
+                    {{ 'bg-danger-500' if order.status == 'Cancelled' }}
+                    text-white px-3 py-1">{{ order.status }}</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items %}
+                            <tr>
+                                <td>
+                                    <div class="flex items-center">
+                                        <img src="{{ url_for('static', filename='images/menu_items/' + item.item.image_file) }}"
+                                            alt="{{ item.item.name }}" class="w-10 h-10 rounded-full mr-3 object-cover">
+                                        <div>
+                                            <h6 class="m-0">{{ item.item.name }}</h6>
+                                            <small class="text-muted">{{ item.item.category }}</small>
+                                            {% if item.options %}
+                                            <div class="text-xs text-secondary mt-1">
+                                                {% if item.options.size %}<div>Size: {{ item.options.size }}</div>{%
+                                                endif %}
+                                                {% if item.options.sugar %}<div>Sugar: {{ item.options.sugar }}</div>{%
+                                                endif %}
+                                                {% if item.options.addons %}<div>Add-ons: {{ item.options.addons|join(',
+                                                    ') }}</div>{% endif %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>${{ "%.2f"|format(item.price_at_order) }}</td>
+                                <td>x{{ item.quantity }}</td>
+                                <td>${{ "%.2f"|format(item.price_at_order * item.quantity) }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr class="font-bold border-t-2">
+                                <td colspan="3" class="text-end">Total Amount:</td>
+                                <td class="text-lg text-primary">${{ "%.2f"|format(order.total_price) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Notes Section -->
+                {% if order.notes %}
+                <div class="mt-4 p-4 bg-light-warning rounded-lg border border-warning-200">
+                    <h6 class="text-warning-800 font-bold mb-1"><i class="feather icon-file-text mr-2"></i>Order Notes:
+                    </h6>
+                    <p class="mb-0 text-dark-500">{{ order.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions & Customer Info -->
+    <div class="col-span-12 lg:col-span-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Customer Info</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted block">Ordered By</small>
+                    <div class="flex items-center mt-1">
+                        <i class="feather icon-user text-primary mr-2"></i>
+                        <span class="font-medium">{{ order.user_id }} (User ID)</span>
+                        {# In real app, we would join Customer table to get name #}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted block">Order Type</small>
+                    <div class="flex items-center mt-1">
+                        {% if order.order_type == 'Dine-in' %}
+                        <i class="feather icon-users text-primary mr-2"></i> Dine-in (Table {{ order.table_number }})
+                        {% elif order.order_type == 'Takeaway' %}
+                        <i class="feather icon-shopping-bag text-warning mr-2"></i> Takeaway
+                        {% else %}
+                        <i class="feather icon-truck text-info mr-2"></i> Delivery
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted block">Date & Time</small>
+                    <div class="flex items-center mt-1">
+                        <i class="feather icon-calendar text-muted mr-2"></i>
+                        <span>{{ order.date_ordered.strftime('%d %b %Y, %H:%M') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5>Identify Status</h5>
+            </div>
+            <div class="card-body flex flex-col gap-3">
+                <a href="{{ url_for('admin.update_order_status', order_id=order.id, status='Preparing') }}"
+                    class="btn w-full btn-info {{ 'disabled' if order.status in ['Preparing', 'Ready', 'Completed', 'Cancelled'] }}">
+                    <i class="feather icon-loader mr-2"></i> Mark Preparing
+                </a>
+                <a href="{{ url_for('admin.update_order_status', order_id=order.id, status='Ready') }}"
+                    class="btn w-full btn-primary {{ 'disabled' if order.status in ['Ready', 'Completed', 'Cancelled'] }}">
+                    <i class="feather icon-bell mr-2"></i> Mark Ready
+                </a>
+                <a href="{{ url_for('admin.update_order_status', order_id=order.id, status='Completed') }}"
+                    class="btn w-full btn-success {{ 'disabled' if order.status in ['Completed', 'Cancelled'] }}">
+                    <i class="feather icon-check mr-2"></i> Mark Completed
+                </a>
+
+                <hr class="my-2">
+
+                <a href="{{ url_for('admin.update_order_status', order_id=order.id, status='Cancelled') }}"
+                    class="btn w-full btn-outline-danger {{ 'disabled' if order.status in ['Cancelled', 'Completed'] }}">
+                    <i class="feather icon-x-circle mr-2"></i> Cancel Order
+                </a>
+
+                <form action="{{ url_for('admin.delete_order', order_id=order.id) }}" method="POST"
+                    onsubmit="return confirm('Are you sure you want to delete this order PERMANENTLY?');">
+                    <button type="submit" class="btn w-full btn-danger mt-2">
+                        <i class="feather icon-trash-2 mr-2"></i> Delete Permanently
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

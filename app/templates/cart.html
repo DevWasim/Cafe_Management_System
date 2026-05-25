@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-20">
+    <div class="row mb-8">
+        <div class="col-12 text-center">
+            <h1 class="display-4 mb-2">Your Cart</h1>
+            <p class="text-muted">Review your selection before checkout</p>
+        </div>
+    </div>
+
+    {% if cart_items %}
+    <div class="cart-wrapper">
+        <!-- Cart Items List -->
+        <div class="cart-list">
+            {% for entry in cart_items %}
+            <div class="app-item-row">
+                <div class="item-visual">
+                    <img src="{{ url_for('static', filename='images/menu_items/' + entry.item.image_file) }}"
+                        alt="{{ entry.item.name }}"
+                        onerror="this.src='https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=200&q=80'">
+                </div>
+                <div class="item-info">
+                    <h4 class="item-name">{{ entry.item.name }}</h4>
+                    <p class="item-desc">
+                        {% if entry.options %}
+                        {% if entry.options.size %}{{ entry.options.size }}{% endif %}
+                        {% if entry.options.sugar %}, {{ entry.options.sugar }}{% endif %}
+                        {% if entry.options.addons %} + {{ entry.options.addons|join(', ') }}{% endif %}
+                        {% else %}
+                        Delicious & Fresh
+                        {% endif %}
+                    </p>
+                    <!-- Mobile Price/Qty Row -->
+                    <div class="item-meta-mobile">
+                        <span class="item-price">${{ "%.2f"|format(entry.item.price) }}</span>
+                        <div class="qty-pill">
+                            <span class="qty-val">x{{ entry.quantity }}</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Desktop Meta (Right Side) -->
+                <div class="item-actions-desktop">
+                    <span class="item-price-lg">${{ "%.2f"|format(entry.item.price * entry.quantity) }}</span>
+                    <a href="{{ url_for('main.remove_from_cart', cart_key=entry.key) }}" class="action-icon">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Upsell / Add-ons (Visual placeholder to match reference vibe) -->
+            <div class="add-more-section mt-4">
+                <p class="text-muted small mb-3 uppercase tracking-wider">You might also like</p>
+                <a href="{{ url_for('main.menu') }}" class="add-more-btn">
+                    <div class="icon-box"><i class="fas fa-plus"></i></div>
+                    <span>Add More Items</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Billing/Checkout Section -->
+        <div class="billing-panel">
+            <h3 class="billing-header">Billing Details</h3>
+
+            <div class="bill-row">
+                <span>Item Total</span>
+                <span>${{ "%.2f"|format(total) }}</span>
+            </div>
+            <div class="bill-row">
+                <span>Delivery Fee</span>
+                <span>$2.00</span>
+            </div>
+            <div class="bill-row">
+                <span>Taxes</span>
+                <span>$1.50</span>
+            </div>
+
+            <div class="bill-divider"></div>
+
+            <div class="bill-total">
+                <span>Total</span>
+                <span class="total-amount">${{ "%.2f"|format(total + 3.50) }}</span>
+            </div>
+
+            {% if current_user.is_authenticated %}
+            <form action="{{ url_for('main.checkout') }}" method="POST">
+                <button type="submit" class="btn-checkout">
+                    Checkout <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+            {% else %}
+            <a href="{{ url_for('main.login', next=url_for('main.view_cart')) }}" class="btn-checkout">
+                Login to Checkout
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart text-center py-20">
+        <div class="mb-6">
+            <i class="fas fa-shopping-basket text-muted" style="font-size: 4rem; opacity: 0.5;"></i>
+        </div>
+        <h2 class="mb-4">Your cart is empty</h2>
+        <p class="text-muted mb-8">Looks like you haven't added anything yet.</p>
+        <a href="{{ url_for('main.menu') }}" class="btn btn-primary">Start Ordering</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

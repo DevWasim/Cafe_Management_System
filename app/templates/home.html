@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section"
+    style="min-height: 90vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+
+    <!-- Static Premium Background -->
+    <div style="position: absolute; inset: 0; z-index: -1;">
+        <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=1920&q=80"
+            alt="Cafe Ambience"
+            style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.3) blur(2px);">
+        <div
+            style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(5,5,5,0.4), #050505);">
+        </div>
+    </div>
+
+    <div class="container text-center" style="max-width: 900px; z-index: 1;">
+        <p class="text-gold uppercase tracking-widest mb-4 font-bold fade-in" style="letter-spacing: 3px;">
+            {{ cafe_settings.hero_subtitle if cafe_settings and cafe_settings.hero_subtitle else 'EST. 2024' }}
+        </p>
+        <h1 class="display-1 mb-6 fade-in"
+            style="font-size: clamp(3rem, 8vw, 6rem); text-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            {{ cafe_settings.hero_title if cafe_settings and cafe_settings.hero_title else 'Taste the Extraordinary' }}
+        </h1>
+        <p class="lead text-muted mb-8 fade-in"
+            style="font-size: 1.25rem; max-width: 700px; margin-left: auto; margin-right: auto; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
+            {{ cafe_settings.short_description if cafe_settings and cafe_settings.short_description else 'A sanctuary
+            for coffee lovers and food enthusiasts. Experience flavor reimagined.' }}
+        </p>
+        <div class="cta-group fade-in" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('main.menu') }}" class="btn btn-primary">Order Now</a>
+            <a href="#about" class="btn btn-gold-outline">Explore Story</a>
+        </div>
+    </div>
+</section>
+
+<!-- Story Section -->
+<section id="about" class="py-20" style="padding: 120px 0; position: relative;">
+    <div class="container">
+        <div class="row" style="display: flex; flex-wrap: wrap; align-items: center; gap: 60px;">
+            <div class="col-md-6" style="flex: 1; min-width: 350px;">
+                <div style="position: relative;">
+                    <div
+                        style="position: absolute; inset: -20px; border: 2px solid var(--primary-color); z-index: -1; transform: rotate(-3deg); border-radius: 20px; opacity: 0.5;">
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80"
+                        alt="Our Story" class="img-fluid"
+                        style="width: 100%; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+                </div>
+            </div>
+            <div class="col-md-6" style="flex: 1; min-width: 350px;">
+                <h2 class="display-4 mb-4" style="font-size: 3rem;">{{ cafe_settings.story_title if cafe_settings and
+                    cafe_settings.story_title else 'Crafting Moments' }}</h2>
+                <div style="width: 80px; height: 4px; background: var(--primary-color); margin-bottom: 30px;"></div>
+
+                <p class="lead text-muted mb-4">{{ cafe_settings.story_content if cafe_settings and
+                    cafe_settings.story_content else 'We believe every cup tells a story. From high-altitude farms to
+                    your table, our journey is defined by passion and precision.' }}</p>
+
+                {% if cafe_settings.mission_content %}
+                <div class="mt-8 p-6"
+                    style="background: rgba(255,255,255,0.03); border-left: 3px solid var(--primary-color); border-radius: 0 12px 12px 0;">
+                    <h4 class="text-white mb-2">Our Mission</h4>
+                    <p class="text-muted mb-0">{{ cafe_settings.mission_content }}</p>
+                </div>
+                {% endif %}
+
+                <a href="{{ url_for('main.menu') }}" class="btn btn-gold-outline mt-8">View Our Menu</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Section -->
+<section id="featured" class="py-20" style="padding: 100px 0;">
+    <div class="container">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl mb-4" style="font-size: 2.5rem;">Chef's Selections</h2>
+            <p class="text-muted">Curated favorites that define our menu</p>
+        </div>
+
+        <div class="menu-grid">
+            {% for item in featured_items %}
+            <div class="menu-card scroll-reveal">
+                <div class="card-img-container">
+                    <img src="{{ url_for('static', filename='images/menu_items/' + item.image_file) }}" class="card-img"
+                        alt="{{ item.name }}"
+                        onerror="this.src='https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80'">
+                </div>
+                <div class="card-content">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <h3 class="card-title mb-0">{{ item.name }}</h3>
+                        <span class="price">${{ item.price }}</span>
+                    </div>
+                    <p class="card-desc">{{ item.description }}</p>
+                    <div class="card-footer">
+                        <span class="text-gold text-sm uppercase tracking-wider font-bold">Featured</span>
+                        <a href="{{ url_for('main.add_to_cart', item_id=item.id) }}" class="btn btn-primary"
+                            style="padding: 8px 20px; font-size: 0.8rem;">Add to Cart</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- Fallback Static Items so it looks good if DB Empty -->
+            <div class="menu-card">
+                <div class="card-img-container">
+                    <img src="https://images.unsplash.com/photo-1572449043416-55f4685c9bb7?auto=format&fit=crop&w=800&q=80"
+                        class="card-img" alt="Example">
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Signature Blend</h3>
+                    <p class="card-desc">Our house roast with notes of chocolate and caramel.</p>
+                    <div class="card-footer">
+                        <span class="price">$5.50</span>
+                        <button class="btn btn-primary" disabled>Sample</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Team Section Removed as per User Request -->
+
+<!-- Testimonials Section -->
+<section id="testimonials" class="py-20" style="padding: 100px 0;">
+    <div class="container">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl mb-2" style="font-size: 2.5rem;">Community Love</h2>
+            <div style="width: 60px; height: 3px; background: var(--primary-color); margin: 0 auto;"></div>
+        </div>
+
+        <div class="row" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;">
+            {% for feedback in testimonials %}
+            <div class="card p-8" style="max-width: 400px; flex: 1;">
+                <div class="mb-6 text-gold">
+                    {% for i in range(feedback.rating) %}
+                    <i class="fas fa-star"></i>
+                    {% endfor %}
+                </div>
+                <p class="text-muted mb-6" style="font-size: 1.1rem; font-style: italic;">"{{ feedback.comment }}"</p>
+                <div class="flex items-center">
+                    <div>
+                        <div class="font-bold text-white">{{ feedback.user.username }}</div>
+                        <div class="text-sm text-muted">{{ feedback.date_posted.strftime('%B %d, %Y') }}</div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- Static Fallback -->
+            <div class="card p-8" style="max-width: 400px;">
+                <div class="mb-4 text-gold"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                        class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p class="text-muted mb-4">"Absolutely the best coffee in the city. The atmosphere is unmatched!"</p>
+                <div class="font-bold text-white">Sarah Jenkins</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Info Section -->
+<section id="info" class="py-20" style="padding: 80px 0; border-top: 1px solid var(--glass-border);">
+    <div class="container text-center">
+        <div class="row" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 40px;">
+            <div class="col-md-4" style="flex: 1; min-width: 250px;">
+                <i class="fas fa-clock mb-4 text-gold" style="font-size: 2rem;"></i>
+                <h5 class="mb-3">Opening Hours</h5>
+                {% if cafe_settings %}
+                <p class="text-muted">{{ cafe_settings.opening_time.strftime('%I:%M %p') }} - {{
+                    cafe_settings.closing_time.strftime('%I:%M %p') }}</p>
+                {% else %}
+                <p class="text-muted">08:00 AM - 10:00 PM</p>
+                {% endif %}
+            </div>
+            <div class="col-md-4" style="flex: 1; min-width: 250px;">
+                <i class="fas fa-map-marker-alt mb-4 text-gold" style="font-size: 2rem;"></i>
+                <h5 class="mb-3">Location</h5>
+                <p class="text-muted">{{ cafe_settings.cafe_address if cafe_settings else '123 Caffee St' }}</p>
+            </div>
+            <div class="col-md-4" style="flex: 1; min-width: 250px;">
+                <i class="fas fa-phone mb-4 text-gold" style="font-size: 2rem;"></i>
+                <h5 class="mb-3">Contact</h5>
+                <p class="text-muted">{{ cafe_settings.cafe_phone if cafe_settings else '+123 456 7890' }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

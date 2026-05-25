@@ -1,0 +1,131 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="row">
+    <!-- Customer Profile -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div
+                    class="w-24 h-24 rounded-full bg-light-primary flex items-center justify-center text-primary font-bold text-4xl mx-auto mb-4">
+                    {{ customer.username[0]|upper }}
+                </div>
+                <h4 class="mb-1">{{ customer.username }}</h4>
+                <p class="text-muted mb-4">Customer</p>
+
+                <div class="text-start mb-4">
+                    <p class="mb-2"><i data-feather="mail" class="w-4 h-4 inline me-2"></i> {{ customer.email }}</p>
+                    <p class="mb-2"><i data-feather="phone" class="w-4 h-4 inline me-2"></i> {{ customer.phone or 'No
+                        phone' }}</p>
+                </div>
+
+                <hr>
+
+                <div class="mt-4">
+                    <h5 class="mb-3">Loyalty Points</h5>
+                    <h2 class="text-warning font-bold mb-3">{{ customer.loyalty_points }}</h2>
+
+                    <form action="{{ url_for('admin.update_loyalty_points', user_id=customer.id) }}" method="POST"
+                        class="d-flex gap-2 justify-content-center">
+                        <input type="number" name="points" class="form-control" placeholder="Points"
+                            style="width: 80px;" required>
+                        <button type="submit" name="action" value="add" class="btn btn-sm btn-outline-success"
+                            title="Add Points">+</button>
+                        <button type="submit" name="action" value="set" class="btn btn-sm btn-outline-primary"
+                            title="Set Points">Set</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order History & Feedback -->
+    <div class="col-md-8">
+        <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders"
+                    type="button" role="tab">Order History</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button"
+                    role="tab">Feedback</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Orders Tab -->
+            <div class="tab-pane fade show active" id="orders" role="tabpanel">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>#{{ order.id }}</td>
+                                        <td>{{ order.date_ordered.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            <span
+                                                class="badge bg-light-{{ 'success' if order.status == 'Completed' else 'warning' }}">
+                                                {{ order.status }}
+                                            </span>
+                                        </td>
+                                        <td>${{ "%.2f"|format(order.total_price) }}</td>
+                                        <td>
+                                            <a href="{{ url_for('admin.order_details', order_id=order.id) }}"
+                                                class="btn btn-sm btn-light-secondary">
+                                                <i data-feather="eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4">No orders found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Tab -->
+            <div class="tab-pane fade" id="feedback" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        {% for entry in feedback_history %}
+                        <div class="border-bottom pb-3 mb-3 last:border-0 last:mb-0 last:pb-0">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex text-warning">
+                                    {% for i in range(entry.rating) %}
+                                    <i data-feather="star" class="fill-current w-4 h-4"></i>
+                                    {% endfor %}
+                                </div>
+                                <small class="text-muted">{{ entry.date_posted.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                            <p class="mb-1 text-gray-700">{{ entry.comment or 'No comment provided.' }}</p>
+                            {% if entry.order_id %}
+                            <small class="text-muted">Related to Order #{{ entry.order_id }}</small>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <p class="text-center text-muted py-4">No feedback submitted.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>{{ legend }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.code.label(class="form-label") }}
+                        {% if form.code.errors %}
+                        {{ form.code(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.code.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.code(class="form-control") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.discount_value.label(class="form-label") }}
+                            {% if form.discount_value.errors %}
+                            {{ form.discount_value(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.discount_value.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.discount_value(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.discount_type.label(class="form-label") }}
+                            {% if form.discount_type.errors %}
+                            {{ form.discount_type(class="form-select is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.discount_type.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.discount_type(class="form-select") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.valid_from.label(class="form-label") }}
+                            {% if form.valid_from.errors %}
+                            {{ form.valid_from(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.valid_from.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.valid_from(class="form-control", type="datetime-local") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.valid_to.label(class="form-label") }}
+                            {% if form.valid_to.errors %}
+                            {{ form.valid_to(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.valid_to.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.valid_to(class="form-control", type="datetime-local") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.usage_limit.label(class="form-label") }}
+                            {% if form.usage_limit.errors %}
+                            {{ form.usage_limit(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.usage_limit.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.usage_limit(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3 flex items-end pb-2">
+                            <div class="form-check">
+                                {{ form.active(class="form-check-input") }}
+                                {{ form.active.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        {{ form.submit(class="btn btn-primary") }}
+                        <a href="{{ url_for('admin.manage_coupons') }}" class="btn btn-light-secondary mt-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

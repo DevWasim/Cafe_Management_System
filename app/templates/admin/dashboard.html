@@ -1,0 +1,319 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<div class="grid grid-cols-12 gap-x-6">
+    <!-- Sales Stats Row -->
+    <div class="col-span-12 xl:col-span-4 md:col-span-6">
+        <div class="card">
+            <div class="card-header !pb-0 !border-b-0">
+                <h5>Daily Sales</h5>
+            </div>
+            <div class="card-body">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <h3 class="font-light flex items-center mb-0">
+                        <i class="feather icon-arrow-up text-success-500 text-[30px] mr-1.5"></i>
+                        ${{ "%.2f"|format(daily_sales) }}
+                    </h3>
+                </div>
+                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
+                    <div class="bg-success-500 h-full rounded-lg" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-span-12 xl:col-span-4 md:col-span-6">
+        <div class="card">
+            <div class="card-header !pb-0 !border-b-0">
+                <h5>Monthly Sales</h5>
+            </div>
+            <div class="card-body">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <h3 class="font-light flex items-center mb-0">
+                        <i class="feather icon-calendar text-primary-500 text-[30px] mr-1.5"></i>
+                        ${{ "%.2f"|format(monthly_sales) }}
+                    </h3>
+                </div>
+                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
+                    <div class="bg-primary-500 h-full rounded-lg" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-span-12 xl:col-span-4 md:col-span-6">
+        <div class="card">
+            <div class="card-header !pb-0 !border-b-0">
+                <h5>Total Revenue</h5>
+            </div>
+            <div class="card-body">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <h3 class="font-light flex items-center mb-0">
+                        <i class="feather icon-credit-card text-warning-500 text-[30px] mr-1.5"></i>
+                        ${{ "%.2f"|format(total_revenue) }}
+                    </h3>
+                </div>
+                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
+                    <div class="bg-warning-500 h-full rounded-lg" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Row -->
+    <div class="col-span-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Sales & Orders Overview</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 350px;">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Selling & Low Stock Row -->
+    <div class="col-span-12 xl:col-span-6 md:col-span-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Best Selling Items</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Price</th>
+                                <th>Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in best_selling %}
+                            <tr>
+                                <td>
+                                    <div class="flex items-center">
+                                        <img src="{{ url_for('static', filename='images/menu_items/' + item.image_file) }}"
+                                            alt="{{ item.name }}" class="w-10 h-10 rounded-full mr-3 object-cover">
+                                        <div>
+                                            <h6 class="m-0">{{ item.name }}</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>${{ "%.2f"|format(item.price) }}</td>
+                                <td><span class="badge bg-light-primary text-primary">{{ item.total_sold }}</span></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center">No sales data yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-span-12 xl:col-span-6 md:col-span-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Low Stock Alerts</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in low_stock_items %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.quantity }} {{ item.unit }}</td>
+                                <td><span class="badge bg-light-danger text-danger">Low Stock</span></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-success">All items well stocked!</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Stats Cards (Small) -->
+    <div class="col-span-12 xl:col-span-4 md:col-span-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="feather icon-shopping-cart text-primary-500 text-[30px]"></i>
+                    </div>
+                    <div class="flex-grow-1 ml-3">
+                        <h6 class="mb-1">Total Orders</h6>
+                        <h3 class="mb-0">{{ total_orders }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-span-12 xl:col-span-4 md:col-span-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="feather icon-check-circle text-success-500 text-[30px]"></i>
+                    </div>
+                    <div class="flex-grow-1 ml-3">
+                        <h6 class="mb-1">Completed</h6>
+                        <h3 class="mb-0">{{ completed_orders }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-span-12 xl:col-span-4 md:col-span-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="feather icon-clock text-warning-500 text-[30px]"></i>
+                    </div>
+                    <div class="flex-grow-1 ml-3">
+                        <h6 class="mb-1">Pending</h6>
+                        <h3 class="mb-0">{{ pending_orders }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders Table -->
+    <div class="col-span-12 xl:col-span-12 md:col-span-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Table</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr class="unread">
+                                <td>#{{ order.id }}</td>
+                                <td><span class="badge bg-light-primary text-primary">{{ order.table_number if
+                                        order.table_number else '-' }}</span></td>
+                                <td>
+                                    <h6 class="mb-1">{{ order.date_ordered.strftime('%d %b, %H:%M') }}</h6>
+                                </td>
+                                <td>
+                                    <span
+                                        class="badge {{ 'bg-success-500' if order.status == 'Completed' else 'bg-warning-500' if order.status == 'Pending' else 'bg-primary-500' }} text-white text-[12px]">{{
+                                        order.status }}</span>
+                                </td>
+                                <td>${{ "%.2f"|format(order.total_price) }}</td>
+                                <td>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        {% if order.status == 'Pending' %}
+                                        <a href="{{ url_for('admin.update_order_status', order_id=order.id, status='Preparing') }}"
+                                            class="btn btn-sm btn-primary">Start</a>
+                                        {% elif order.status == 'Preparing' %}
+                                        <a href="{{ url_for('admin.update_order_status', order_id=order.id, status='Ready') }}"
+                                            class="btn btn-sm btn-warning">Ready</a>
+                                        {% elif order.status == 'Ready' %}
+                                        <a href="{{ url_for('admin.update_order_status', order_id=order.id, status='Completed') }}"
+                                            class="btn btn-sm btn-success">Complete</a>
+                                        {% endif %}
+                                        <!-- <a href="#" class="btn btn-sm btn-outline-secondary"><i
+                                                class="feather icon-eye"></i></a> -->
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">No orders found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var ctx = document.getElementById('salesChart').getContext('2d');
+
+        // Simulating data for graph since we haven't passed time-series data yet.
+        // In a real app we'd pass JSON data for the last 7 days from Flask.
+        // For now, let's just make it look good.
+        var salesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Daily Sales ($)',
+                    data: [120, 190, 30, 50, 20, 300, {{ daily_sales }}], // Inject today's sales
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }, {
+            label: 'Orders',
+            data: [12, 19, 3, 5, 2, 30, {{ completed_orders }}],
+            type: 'line',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 2,
+            fill: false,
+            yAxisID: 'y1'
+                }]
+            },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                type: 'linear',
+                display: true,
+                position: 'left',
+            },
+            y1: {
+                beginAtZero: true,
+                type: 'linear',
+                display: true,
+                position: 'right',
+                grid: {
+                    drawOnChartArea: false, // only want the grid lines for one axis to show up
+                },
+            },
+        }
+    }
+        });
+    });
+</script>
+{% endblock %}
